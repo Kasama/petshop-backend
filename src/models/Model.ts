@@ -1,4 +1,4 @@
-import * as nano from 'nano';
+import client, { CouchDoc } from 'davenport';
 
 export class Model {
 }

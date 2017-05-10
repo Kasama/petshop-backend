@@ -3,14 +3,18 @@ import {ClientController} from '../controllers/ClientController';
 
 export class ClientRouter {
 	router: Router;
+	controller: ClientController;
 
 	constructor() {
 		this.router = Router();
+		this.controller = new ClientController();
 		this.init();
 	}
 
 	public listClients(req: Request, res: Response, next: NextFunction) {
-		res.send({clients: [{'name': 'jose', 'age': 30}]});
+		this.controller.getAllClients((clients) => {
+			res.send(clients);
+		});
 	}
 
 	init() {
