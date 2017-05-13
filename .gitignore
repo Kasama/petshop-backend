@@ -39,6 +39,9 @@ jspm_packages/
 # Typescript compiled files
 dist/
 
+# IntelliJ files
+.idea/
+
 # Typescript v1 declaration files
 typings/
 

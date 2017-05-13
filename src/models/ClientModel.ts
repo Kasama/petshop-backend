@@ -1,19 +1,20 @@
-import Client, { CouchDoc } from 'davenport';
+import Database, { Couch } from '../db/db';
 
-interface ClientInterface extends CouchDoc {
-	name: string,
-	age: number,
-}
+class Client implements Couch.Document {
 
-export class ClientModel {
+	private static database: Database<Client> = new Database<Client>(Client);
 
-	database: Client<ClientInterface>;
+	name: string;
+	age: number;
 
-	constructor() {
-		this.database = new Client<ClientInterface> ('http://localhost:5984/', 'clients');
+	public static async dbExists(): Promise<Couch.Existence> {
+		return Client.database.exists();
 	}
+
+	public static async createDB(): Promise<Couch.Status> {
+		return Client.database.createDB();
+	}
+
 }
 
-
-
-export default ClientModel;
+export default Client;
