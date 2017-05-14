@@ -40,25 +40,36 @@ class Database<T extends Couch.Document> {
 	}
 
 	public getCookies(): string {
-		return this.cookieJar.getCookieString(url);
+		// return this.cookieJar.getCookieString(url);
+		return ' ';
 	}
 
 	public async cleanUp(): Promise<void> {
 		if (this.getCookies().length == 0){
 			console.log("need to cleanup");
-			await this.deauthenticate();
+			// await this.deauthenticate();
 			console.log("Cleaned up");
 		}
 	}
 
 	private async headerFor(path: string = '', form: any = {}): Promise<request.Options> {
-		let ret = { url: url + '/' + path, json: true, jar: this.cookieJar };
+		let ret = {
+			url: url + '/' + path,
+			json: true,
+			// jar: this.cookieJar
+			auth: {
+				user: dbUser,
+				pass: dbPass,
+			}
+		} as request.Options;
+		/*
 		if (this.getCookies().length == 0){
 			console.log("need authentication");
 			const status = await this.authenticate();
 			console.log("authenticated, token: " + this.getCookies());
 			console.log("status: " + JSON.stringify(status));
 		}
+		*/
 		return Object.assign(ret, form);
 	}
 
@@ -154,6 +165,7 @@ class Database<T extends Couch.Document> {
 			request.put(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
+					console.log("requested creation with:" + JSON.stringify(resp.request));
 					if (err) {
 						reject(err);
 					} else {

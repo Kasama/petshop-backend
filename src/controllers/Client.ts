@@ -2,50 +2,47 @@ import Model from '../models/Client';
 
 export class Client {
 
+	params: any;
+	success: (answer: any) => void;
+	fail: (err: Error) => void;
+
 	async cleanUp(): Promise<void> {
 		return Model.cleanUp();
 	}
 
+	doSomething(
+		params: any,
+		success: (answer: any) => void,
+		fail: (err: Error) => void,
+		something: string
+	): void {
+		this[something].bind({params: params, success: success, fail: fail});
+	}
+
 	exists(
 		success: (answer: any) => void,
-		fail: (err: any) => void
-	): void {
-		const promise = Model.dbExists();
-		promise.then(success);
-		promise.catch(fail);
+		fail: (err: Error) => void
+	): void{
+		Model.dbExists()
+		.then(success)
+		.catch(fail);
 	}
 
 	createDB(
 		success: (answer: any) => void,
-		fail: (err: any) => void
+		fail: (err: Error) => void
 	): void {
-		const promise = Model.createDB();
-		promise.then(success);
-		promise.catch(fail);
+		Model.createDB()
+		.then(success)
+		.catch(fail);
 	}
 
-	getAllClients(
-		success: (model: object) => void,
-		fail: (err: any) => void
-	): void {
-		/*
-			const promise = this.model.database.listWithoutDocs();
-			promise.then((client) => success(client));
-			promise.catch((err) => fail(err));
-			*/
+	getAll(s, f): void {
+		// this.doSomething(...args, Model.all);
 	}
 
-	addClient(
-		params: any,
-		success: (model: object) => void,
-		fail: (err: any) => void
-	): void {
-		/*
-		const newClient: ClientInterface = {name, age};
-		const promise = this.model.database.post(newClient);
-		promise.then((client) => success(client));
-		promise.catch((err) => fail(err));
-		*/
+	add(p, s, f): void {
+		// this.doSomething(...args, Model.add);
 	}
 }
 
