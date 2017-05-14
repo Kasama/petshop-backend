@@ -1,47 +1,25 @@
 import Model from '../models/Client';
+import ApplicationController from './ApplicationController';
 
-export class Client {
+export class Client extends ApplicationController {
 
-	params: any;
-	success: (answer: any) => void;
-	fail: (err: Error) => void;
-
-	async cleanUp(): Promise<void> {
-		return Model.cleanUp();
-	}
-
-	doSomething(
-		params: any,
-		success: (answer: any) => void,
-		fail: (err: Error) => void,
-		something: string
-	): void {
-		this[something].bind({params: params, success: success, fail: fail});
-	}
-
-	exists(
-		success: (answer: any) => void,
-		fail: (err: Error) => void
-	): void{
+	exists(): void{
 		Model.dbExists()
-		.then(success)
-		.catch(fail);
+		.then(this.success)
+		.catch(this.fail);
 	}
 
-	createDB(
-		success: (answer: any) => void,
-		fail: (err: Error) => void
-	): void {
+	createDB(): void {
 		Model.createDB()
-		.then(success)
-		.catch(fail);
+		.then(this.success)
+		.catch(this.fail);
 	}
 
-	getAll(s, f): void {
+	getAll(): void {
 		// this.doSomething(...args, Model.all);
 	}
 
-	add(p, s, f): void {
+	add(): void {
 		// this.doSomething(...args, Model.add);
 	}
 }

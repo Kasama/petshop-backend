@@ -10,14 +10,10 @@ export class Client extends ApplicationRouter {
 	}
 
 	init() {
-		this.get('/', this.controller.getAll);
-		this.get('/create', this.controller.createDB);
-		this.get('/exists', this.controller.exists);
-		this.post('/add', this.controller.add);
-	}
-
-	public async cleanUp(): Promise<void> {
-		return this.controller.cleanUp();
+		this.get('/', 'getAll');
+		this.get('/create', 'createDB');
+		this.get('/exists', 'exists');
+		this.post('/add', 'add');
 	}
 }
 

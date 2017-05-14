@@ -39,8 +39,7 @@ class App {
 			process.kill(process.pid, signal);
 		}
 
-		ClientRouter.cleanUp()
-		.then(suicide.bind(signal)).catch(suicide.bind(signal));
+		suicide();
 	}
 }
 
