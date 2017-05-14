@@ -1,14 +1,18 @@
 import {Router, Request, Response, NextFunction} from 'express';
-import ClientController from '../controllers/ClientController';
+import Controller from '../controllers/Client';
 
-export class ClientRouter {
+export class Client {
 	router: Router;
-	controller: ClientController;
+	controller: Controller;
 
 	constructor() {
 		this.router = Router();
-		this.controller = new ClientController();
+		this.controller = new Controller();
 		this.init();
+	}
+
+	public async cleanUp(): Promise<void> {
+		return this.controller.cleanUp();
 	}
 
 	public exists(req: Request, res: Response, next: NextFunction) {
@@ -63,7 +67,4 @@ export class ClientRouter {
 	}
 }
 
-const clientRoutes = new ClientRouter();
-clientRoutes.init();
-
-export default clientRoutes.router;
+export default new Client();

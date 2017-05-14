@@ -7,6 +7,10 @@ class Client implements Couch.Document {
 	name: string;
 	age: number;
 
+	public static async cleanUp(): Promise<void> {
+		return Client.database.cleanUp();
+	}
+
 	public static async dbExists(): Promise<Couch.Existence> {
 		return Client.database.exists();
 	}

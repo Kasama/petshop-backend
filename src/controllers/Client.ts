@@ -1,12 +1,16 @@
-import Client from '../models/ClientModel';
+import Model from '../models/Client';
 
-export class ClientController {
+export class Client {
+
+	async cleanUp(): Promise<void> {
+		return Model.cleanUp();
+	}
 
 	exists(
 		success: (answer: any) => void,
 		fail: (err: any) => void
 	): void {
-		const promise = Client.dbExists();
+		const promise = Model.dbExists();
 		promise.then(success);
 		promise.catch(fail);
 	}
@@ -15,7 +19,7 @@ export class ClientController {
 		success: (answer: any) => void,
 		fail: (err: any) => void
 	): void {
-		const promise = Client.createDB();
+		const promise = Model.createDB();
 		promise.then(success);
 		promise.catch(fail);
 	}
@@ -45,4 +49,4 @@ export class ClientController {
 	}
 }
 
-export default ClientController;
+export default Client;

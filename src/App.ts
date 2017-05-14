@@ -3,7 +3,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 
-import ClientRouter from './routes/ClientRouter';
+import ClientRouter from './routes/Client';
 
 class App {
 	public express: express.Application;
@@ -29,8 +29,19 @@ class App {
 			});
 		});
 		this.express.use('/', router);
-		this.express.use('/clients', ClientRouter);
+		this.express.use('/clients', ClientRouter.router);
+	}
+
+	public cleanUp(exitCode: number|null, signal: string|null): void {
+		if (!signal) signal = "SIGTERM";
+
+		const suicide = () => {
+			process.kill(process.pid, signal);
+		}
+
+		ClientRouter.cleanUp()
+		.then(suicide.bind(signal)).catch(suicide.bind(signal));
 	}
 }
 
-export default new App().express;
+export default new App();
