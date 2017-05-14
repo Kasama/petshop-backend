@@ -33,6 +33,7 @@ class Database<T extends Couch.Document> {
 
 	constructor(instance: { new(): T }) {
 		this.databaseName = instance.name.toLowerCase();
+		this.databasePath = this.databaseName + '/';
 		this.cookieJar = request.jar();
 		console.log("empyt jar '" + this.getCookies() + "'");
 
@@ -129,6 +130,32 @@ class Database<T extends Couch.Document> {
 				(err: any, resp: request.RequestResponse, body: any) => {
 					if (err) reject(err)
 					else accept(resp.body['uuids'][0]);
+				}
+			);
+		});
+	}
+
+	public async save(data: any): Promise<Couch.Status> {
+		let uuid: string;
+		if (data._id)
+			uuid = data._id;
+		else
+			uuid = await this.getUUID();
+		console.log("using data: " + data.name + ',' + data.age);
+		const header = await this.headerFor(this.databasePath + uuid, {form: {name: data.name, age: data.age}});
+		console.log("using header: " + JSON.stringify(header));
+		return new Promise<Couch.Status>((accept, reject) => {
+			request.put(
+				header,
+				(err: any, resp: request.RequestResponse, body: any) => {
+					if (err) {
+						reject(err);
+					} else {
+						let status = {success: resp.body['ok']} as Couch.Status;
+						if (resp.body['reason'])
+							status.message = resp.body['reason'];
+						accept(status);
+					}
 				}
 			);
 		});

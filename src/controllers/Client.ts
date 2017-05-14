@@ -20,7 +20,12 @@ export class Client extends ApplicationController {
 	}
 
 	add(): void {
-		// this.doSomething(...args, Model.add);
+		let model: Model;
+		model = new Model();
+		console.log("recv params: " + JSON.stringify(this.params));
+		model.age = this.params['age'];
+		model.name = this.params['name'];
+		model.save().then(this.success).catch(this.fail);
 	}
 }
 

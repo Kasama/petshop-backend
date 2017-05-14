@@ -13,10 +13,17 @@ export abstract class ApplicationRouter {
 
 	abstract init(): void;
 
+	public safetyCheck(method: string) {
+		if (!this.controller.hasMethod(method))
+			throw new Error("Method '" + method + "' does not exist in controller");
+	}
+
 	public get(
 		path: string,
-		handler: string
+		func: () => void
 	) {
+		const handler: string = func.name;
+		this.safetyCheck(handler);
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +35,7 @@ export abstract class ApplicationRouter {
 					(err) => {
 						res.send({error: err});
 					},
-					handler
+					func
 				);
 			}
 		);
@@ -36,9 +43,11 @@ export abstract class ApplicationRouter {
 
 	public post(
 		path: string,
-		handler: string
+		func: () => void
 	) {
-		this.router.get(
+		const handler: string = func.name;
+		this.safetyCheck(handler);
+		this.router.post(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(
@@ -49,7 +58,7 @@ export abstract class ApplicationRouter {
 					(err) => {
 						res.send({error: err});
 					},
-					handler
+					func
 				);
 			}
 		);
@@ -57,8 +66,10 @@ export abstract class ApplicationRouter {
 
 	public delete(
 		path: string,
-		handler: string
+		func: () => void
 	) {
+		const handler: string = func.name;
+		this.safetyCheck(handler);
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
@@ -70,7 +81,7 @@ export abstract class ApplicationRouter {
 					(err) => {
 						res.send({error: err});
 					},
-					handler
+					func
 				);
 			}
 		);
