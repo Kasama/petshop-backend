@@ -28,7 +28,7 @@ export abstract class ApplicationRouter {
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(
-					req.params,
+					req.query,
 					(response) => {
 						res.send(response);
 					},
@@ -51,7 +51,7 @@ export abstract class ApplicationRouter {
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(
-					req.params,
+					req.body,
 					(response) => {
 						res.send(response);
 					},

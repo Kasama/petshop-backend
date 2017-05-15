@@ -23,12 +23,7 @@ class App {
 	private routes(): void {
 		let router = express.Router();
 
-		router.get('/', (req, res, next) => {
-			res.json({
-				message: 'Hellow!'
-			});
-		});
-		this.express.use('/', router);
+		this.express.use('/', express.static(__dirname + '/public'));
 		this.express.use('/clients', ClientRouter.router);
 	}
 

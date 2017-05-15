@@ -20,10 +20,7 @@ class Client implements Couch.Document {
 	}
 
 	public async save(): Promise<Couch.Status> {
-		console.log("client: " + JSON.stringify(this));
-		console.log("client name: " + this.name);
-		console.log("client age: " + this.age);
-		return Client.database.save({name: this.name, age: this.age});
+		return Client.database.save(this);
 	}
 
 }

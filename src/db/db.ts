@@ -1,6 +1,6 @@
 import * as request from 'request';
 
-const url = 'http://localhost:5984';
+const url = 'http://192.168.1.103:5984';
 const dbUser = 'admin';
 const dbPass = 'admin';
 
@@ -23,7 +23,6 @@ export module Couch {
 function isOk(response: request.RequestResponse){
 	return (response.statusCode >= 200 && response.statusCode < 300);
 }
-
 
 class Database<T extends Couch.Document> {
 
@@ -141,9 +140,7 @@ class Database<T extends Couch.Document> {
 			uuid = data._id;
 		else
 			uuid = await this.getUUID();
-		console.log("using data: " + data.name + ',' + data.age);
-		const header = await this.headerFor(this.databasePath + uuid, {form: {name: data.name, age: data.age}});
-		console.log("using header: " + JSON.stringify(header));
+		const header = await this.headerFor(this.databasePath + uuid, {body: data});
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
 				header,
@@ -192,7 +189,6 @@ class Database<T extends Couch.Document> {
 			request.put(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
-					console.log("requested creation with:" + JSON.stringify(resp.request));
 					if (err) {
 						reject(err);
 					} else {
