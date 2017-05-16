@@ -13,10 +13,12 @@ export abstract class ApplicationRouter {
 
 	abstract init(): void;
 
+	/*
 	public safetyCheck(method: string) {
 		if (!this.controller.hasMethod(method))
 			throw new Error("Method '" + method + "' does not exist in controller");
 	}
+	*/
 
 	public get(
 		path: string,

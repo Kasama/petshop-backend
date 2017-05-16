@@ -10,7 +10,7 @@ export abstract class ApplicationController {
 		fail: (err: Error) => void,
 		func: () => void
 	): void {
-		// This may smell a bit, but its
+		// This may smell a bit, but it's
 		// for the greater good
 		func.bind({
 			params: params,
@@ -20,12 +20,14 @@ export abstract class ApplicationController {
 		})();
 	}
 
+	/*
 	hasMethod(name: string): boolean {
 		if (typeof this[name] == 'function')
 			return true
 		else
 			return false
 	}
+	*/
 }
 
 export default ApplicationController;

@@ -1,34 +1,36 @@
-import Model from '../models/Client';
+import ClientModel from '../models/Client';
 import ApplicationController from './ApplicationController';
 
 export class Client extends ApplicationController {
 
+	static Model = new ClientModel();
+
 	exists(): void{
-		Model.dbExists()
+		Client.Model.dbExists()
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	createDB(): void {
-		Model.createDB()
+		Client.Model.createDB()
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	get(): void {
 		console.log("this is: " + JSON.stringify(this));
-		Model.get(this.params['id'])
+		Client.Model.get(this.params['id'])
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	getAll(): void {
-		// this.doSomething(...args, Model.all);
+		// this.doSomething(...args, Client.Model.all);
 	}
 
 	add(): void {
-		let model: Model;
-		model = new Model();
+		let model: ClientModel;
+		model = new ClientModel();
 		console.log("recv params: " + JSON.stringify(this.params));
 		model.age = this.params['age'];
 		model.name = this.params['name'];

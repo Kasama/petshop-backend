@@ -13,8 +13,8 @@ export class Client extends ApplicationRouter {
 		this.get('/', this.controller.getAll);
 		this.get('/create', this.controller.createDB);
 		this.get('/exists', this.controller.exists);
-		this.get('/:id', this.controller.get);
 		this.post('/add', this.controller.add);
+		this.get('/:id', this.controller.get);
 	}
 }
 

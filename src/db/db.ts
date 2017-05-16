@@ -28,29 +28,33 @@ class Database<T extends Couch.Document> {
 
 	databaseName: string;
 	databasePath: string;
-	cookieJar: request.CookieJar;
+	// cookieJar: request.CookieJar;
 
 	constructor(instance: { new(): T }) {
 		this.databaseName = instance.name.toLowerCase();
 		this.databasePath = this.databaseName + '/';
-		this.cookieJar = request.jar();
-		console.log("empyt jar '" + this.getCookies() + "'");
+		// this.cookieJar = request.jar();
+		// console.log("empyt jar '" + this.getCookies() + "'");
 
 		console.log("db = '" + this.databaseName + "'");
 	}
 
+	/*
 	public getCookies(): string {
-		// return this.cookieJar.getCookieString(url);
+		return this.cookieJar.getCookieString(url);
 		return ' ';
 	}
+	*/
 
+   /*
 	public async cleanUp(): Promise<void> {
 		if (this.getCookies().length == 0){
 			console.log("need to cleanup");
-			// await this.deauthenticate();
+			await this.deauthenticate();
 			console.log("Cleaned up");
 		}
 	}
+	*/
 
 	private async headerFor(path: string = '', form: any = {}): Promise<request.Options> {
 		let ret = {
@@ -73,6 +77,7 @@ class Database<T extends Couch.Document> {
 		return Object.assign(ret, form);
 	}
 
+	/*
 	private async authenticate(): Promise<Couch.Status> {
 		return new Promise<Couch.Status>((accept, reject) => {
 			const header = {
@@ -120,6 +125,7 @@ class Database<T extends Couch.Document> {
 			);
 		});
 	}
+	*/
 
 	public async getUUID(): Promise<string> {
 		const header = await this.headerFor('_uuids');
@@ -168,6 +174,7 @@ class Database<T extends Couch.Document> {
 						reject(err);
 					} else {
 						if (resp.body['error']) {
+							// TODO Catch it ouside
 							reject(new Error(resp.body['reason']));
 						} else {
 							accept(resp.body);

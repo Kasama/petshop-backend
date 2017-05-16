@@ -2,38 +2,34 @@ import Database, { Couch } from '../db/db';
 
 abstract class ApplicationModel implements Couch.Document {
 
-	private static _database: Database<ApplicationModel>;
-	protected static klass;
+	private database: Database<ApplicationModel>;
 
-	protected static get database(): Database<ApplicationModel> {
-		if (!ApplicationModel._database) {
-			ApplicationModel._database = new Database<ApplicationModel>(ApplicationModel.klass);
-		}
-		return ApplicationModel._database;
+	constructor(klass) {
+		this.database = new Database<ApplicationModel>(klass);
 	}
 
-	public static async cleanUp(): Promise<void> {
-		return ApplicationModel.database.cleanUp();
+	public async cleanUp(): Promise<void> {
+		// return this.database.cleanUp();
 	}
 
-	public static async dbExists(): Promise<Couch.Existence> {
-		return ApplicationModel.database.exists();
+	public async dbExists(): Promise<Couch.Existence> {
+		return this.database.exists();
 	}
 
-	public static async createDB(): Promise<Couch.Status> {
-		return ApplicationModel.database.createDB();
+	public async createDB(): Promise<Couch.Status> {
+		return this.database.createDB();
 	}
 
-	public static async get(id: string): Promise<ApplicationModel> {
-		return ApplicationModel.database.get(id);
+	public async get(id: string): Promise<ApplicationModel> {
+		return this.database.get(id);
 	}
 
-	public static async all(): Promise<ApplicationModel[]> {
-		return ApplicationModel.database.all();
+	public async all(): Promise<ApplicationModel[]> {
+		return this.database.all();
 	}
 
 	public async save(): Promise<Couch.Status> {
-		return ApplicationModel.database.save(this);
+		return this.database.save(this);
 	}
 
 }
