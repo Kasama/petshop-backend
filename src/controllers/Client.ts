@@ -15,6 +15,13 @@ export class Client extends ApplicationController {
 		.catch(this.fail);
 	}
 
+	get(): void {
+		console.log("this is: " + JSON.stringify(this));
+		Model.get(this.params['id'])
+		.then(this.success)
+		.catch(this.fail);
+	}
+
 	getAll(): void {
 		// this.doSomething(...args, Model.all);
 	}

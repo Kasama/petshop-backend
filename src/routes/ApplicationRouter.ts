@@ -22,13 +22,13 @@ export abstract class ApplicationRouter {
 		path: string,
 		func: () => void
 	) {
-		const handler: string = func.name;
-		this.safetyCheck(handler);
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
+				console.log("got query: " + JSON.stringify(req.query));
+				console.log("got params: " + JSON.stringify(req.params));
 				this.controller.handle(
-					req.query,
+					Object.assign(req.query, req.params),
 					(response) => {
 						res.send(response);
 					},
@@ -45,8 +45,6 @@ export abstract class ApplicationRouter {
 		path: string,
 		func: () => void
 	) {
-		const handler: string = func.name;
-		this.safetyCheck(handler);
 		this.router.post(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
@@ -68,8 +66,6 @@ export abstract class ApplicationRouter {
 		path: string,
 		func: () => void
 	) {
-		const handler: string = func.name;
-		this.safetyCheck(handler);
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {

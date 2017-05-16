@@ -1,6 +1,6 @@
 import * as request from 'request';
 
-const url = 'http://192.168.1.103:5984';
+const url = 'http://191.189.112.147:5984';
 const dbUser = 'admin';
 const dbPass = 'admin';
 
@@ -158,9 +158,30 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async all(): Promise<T> {
-		const data: any = {};
-		return data;
+	public async get(id: string): Promise<T> {
+		const header = await this.headerFor(this.databaseName + '/' +  id);
+		return new Promise<T>((accept, reject) => {
+			request.get(
+				header,
+				(err: any, resp: request.RequestResponse, body: any) => {
+					if (err) {
+						reject(err);
+					} else {
+						if (resp.body['error']) {
+							reject(new Error(resp.body['reason']));
+						} else {
+							accept(resp.body);
+						}
+					}
+				}
+			);
+		});
+	}
+
+	public async all(): Promise<T[]> {
+		const header = await this.headerFor(this.databaseName + '/_all_docs');
+		return new Promise<T[]>((accept, reject) => {
+		});
 	}
 
 	public async exists(): Promise<Couch.Existence> {
