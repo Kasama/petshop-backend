@@ -144,8 +144,10 @@ class Database<T extends Couch.Document> {
 		let uuid: string;
 		if (data._id)
 			uuid = data._id;
-		else
+		else {
 			uuid = await this.getUUID();
+			data._id = uuid;
+		}
 		const header = await this.headerFor(this.databasePath + uuid, {body: data});
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
@@ -165,7 +167,7 @@ class Database<T extends Couch.Document> {
 	}
 
 	public async get(id: string): Promise<T> {
-		const header = await this.headerFor(this.databaseName + '/' +  id);
+		const header = await this.headerFor(this.databasePath + id);
 		return new Promise<T>((accept, reject) => {
 			request.get(
 				header,
@@ -186,7 +188,7 @@ class Database<T extends Couch.Document> {
 	}
 
 	public async all(): Promise<T[]> {
-		const header = await this.headerFor(this.databaseName + '/_all_docs');
+		const header = await this.headerFor(this.databasePath + '_all_docs');
 		return new Promise<T[]>((accept, reject) => {
 		});
 	}
