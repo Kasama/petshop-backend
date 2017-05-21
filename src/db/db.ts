@@ -193,10 +193,12 @@ class Database<T extends Couch.Document> {
 					if (err) {
 						reject(err)
 					} else {
-						let error = resp.body['error'];
+						let exists: boolean;
+						if (resp.body['error']) exists = false;
+						else exists = true;
 						accept({
 							database: this.databaseName,
-							exists: error,
+							exists: exists,
 							message: resp.body['reason']
 						});
 					}
