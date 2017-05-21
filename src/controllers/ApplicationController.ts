@@ -19,15 +19,6 @@ export abstract class ApplicationController {
 			self: this
 		})();
 	}
-
-	/*
-	hasMethod(name: string): boolean {
-		if (typeof this[name] == 'function')
-			return true
-		else
-			return false
-	}
-	*/
 }
 
 export default ApplicationController;

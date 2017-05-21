@@ -4,7 +4,7 @@ import {ApplicationController} from '../controllers/ApplicationController';
 function successResponse(res): (response) => void {
 	return function(response) {
 		let r = response;
-		if (typeof r.map === 'function'){
+		if (typeof r.map === 'function') {
 			r = r.map(one => {
 				if (typeof one.normalizedModel === 'function') {
 					return one.normalizedModel();
@@ -16,13 +16,13 @@ function successResponse(res): (response) => void {
 				r = r.normalizedModel();
 		}
 		res.send(r);
-	}
+	};
 }
 
 function errorResponse(res): (err) => void {
 	return function(err) {
 		res.send({error: err});
-	}
+	};
 }
 
 export abstract class ApplicationRouter {
@@ -44,8 +44,8 @@ export abstract class ApplicationRouter {
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
-				let params = Object.assign(req.query, req.params);
-				console.log("get params: " + JSON.stringify(params));
+				const params = Object.assign(req.query, req.params);
+				console.log('get params: ' + JSON.stringify(params));
 				this.controller.handle(
 					params, successResponse(res), errorResponse(res), func
 				);

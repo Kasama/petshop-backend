@@ -8,7 +8,7 @@ import ClientRouter from './routes/Client';
 class App {
 	public express: express.Application;
 
-	constructor(){
+	constructor() {
 		this.express = express();
 		this.middleware();
 		this.routes();
@@ -21,18 +21,18 @@ class App {
 	}
 
 	private routes(): void {
-		let router = express.Router();
+		const router = express.Router();
 
 		this.express.use('/', express.static(__dirname + '/public'));
 		this.express.use('/clients', ClientRouter.router);
 	}
 
 	public cleanUp(exitCode: number|null, signal: string|null): void {
-		if (!signal) signal = "SIGTERM";
+		if (!signal) signal = 'SIGTERM';
 
 		const suicide = () => {
 			process.kill(process.pid, signal);
-		}
+		};
 
 		suicide();
 	}

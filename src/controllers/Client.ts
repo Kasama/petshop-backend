@@ -5,7 +5,7 @@ export class Client extends ApplicationController {
 
 	static Model = new ClientModel();
 
-	exists(): void{
+	exists(): void {
 		Client.Model.dbExists()
 		.then(this.success)
 		.catch(this.fail);
@@ -18,7 +18,7 @@ export class Client extends ApplicationController {
 	}
 
 	get(): void {
-		console.log("this is: " + JSON.stringify(this));
+		console.log('this is: ' + JSON.stringify(this));
 		Client.Model.get(this.params['id'])
 		.then(this.success)
 		.catch(this.fail);
@@ -26,10 +26,10 @@ export class Client extends ApplicationController {
 
 	getAll(): void {
 		Promise.resolve();
-		let resp = [];
-		let promises: Promise<any>[] = [];
-		for (let k in this.params) {
-			console.log("finding param " + k + " = " + this.params[k]);
+		const resp = [];
+		const promises: Promise<any>[] = [];
+		for (const k in this.params) {
+			console.log('finding param ' + k + ' = ' + this.params[k]);
 			let prom: Promise<any>;
 			if (k) {
 				if (this.params[k] instanceof Array)

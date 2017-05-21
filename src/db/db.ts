@@ -7,31 +7,31 @@ const dbPass = 'admin';
 const designDoc = '_design/docs';
 
 // Needed for couchdb views
-var emit: (key: string, value: any) => void;
+const emit: (key: string, value: any) => void = () => {};
 
-export module Couch {
+export namespace Couch {
 	export interface Document {
-		_id?: string,
-		_rev?: string,
+		_id?: string;
+		_rev?: string;
 	}
 	export interface Existence {
-		database: string,
-		exists: boolean,
-		message: string
+		database: string;
+		exists: boolean;
+		message: string;
 	}
 	export interface Status {
-		success: boolean,
-		message?: string,
-		data?: any
+		success: boolean;
+		message?: string;
+		data?: any;
 	}
 	export interface View {
-		_id: string,
-		_rev: string,
-		views: any
+		_id: string;
+		_rev: string;
+		views: any;
 	}
 }
 
-function isOk(response: request.RequestResponse){
+function isOk(response: request.RequestResponse) {
 	return (response.statusCode >= 200 && response.statusCode < 300);
 }
 
@@ -47,12 +47,12 @@ class Database<T extends Couch.Document> {
 		this.instance = instance;
 		this.databaseName = instance.name.toLowerCase();
 		this.databasePath = this.databaseName + '/';
-		this.databaseView = this.databasePath + designDoc
+		this.databaseView = this.databasePath + designDoc;
 		this.databaseQuery = this.databaseView + '/_view/';
 	}
 
-	private async headerFor(path: string = '', form: any = {}): Promise<request.Options> {
-		let ret = {
+	private async headerFor(path = '', form: any = {}): Promise<request.Options> {
+		const ret = {
 			url: url + '/' + path,
 			json: true,
 			auth: {
@@ -65,22 +65,22 @@ class Database<T extends Couch.Document> {
 
 	private makeViewFor(property: string): any {
 		const underscore = property.startsWith('_') ? '' : '_';
-		const name = "by" + underscore + property;
-		const mapFunc = "function(doc) { emit(doc." + property + ", doc); }";
-		const redFunc = "";
-		let view = {};
+		const name = 'by' + underscore + property;
+		const mapFunc = 'function(doc) { emit(doc.' + property + ', doc); }';
+		const redFunc = '';
+		const view = {};
 		view[name] = { map: mapFunc };
 		return view;
 	}
 
 	public async makeViewsFor(model: any): Promise<Couch.Status> {
-		let doc = {
+		const doc = {
 			_id: designDoc,
 			language: 'javascript',
 			views: {}
 		};
-		for (let prop in model) {
-			if (model.hasOwnProperty(prop)){
+		for (const prop in model) {
+			if (model.hasOwnProperty(prop)) {
 				doc.views = Object.assign(doc.views, this.makeViewFor(prop));
 			}
 		}
@@ -109,8 +109,8 @@ class Database<T extends Couch.Document> {
 			request.get(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
-					if (err) reject(err)
-						else accept(resp.body['uuids'][0]);
+					if (err) reject(err);
+					else accept(resp.body['uuids'][0]);
 				}
 			);
 		});
@@ -132,7 +132,7 @@ class Database<T extends Couch.Document> {
 					if (err) {
 						reject(err);
 					} else {
-						let status = {success: resp.body['ok']} as Couch.Status;
+						const status = {success: resp.body['ok']} as Couch.Status;
 						if (resp.body['reason'])
 							status.message = resp.body['reason'];
 						accept(status);
@@ -152,19 +152,19 @@ class Database<T extends Couch.Document> {
 					return v;
 				return '"' + v + '"';
 			});
-			const body = { qs: { keys: "[" + quotify.toString() + "]" } };
+			const body = { qs: { keys: '[' + quotify.toString() + ']' } };
 			header = await this.headerFor(this.databaseQuery + by, body);
 		} else header = await this.headerFor(this.databaseQuery + by);
-		console.log("header: " + JSON.stringify(header));
+		console.log('header: ' + JSON.stringify(header));
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
-					console.log("request: " + JSON.stringify(resp.request));
+					console.log('request: ' + JSON.stringify(resp.request));
 					if (err) {
 						reject(err);
 					} else {
-						let rows: Array<any> = resp.body['rows'];
+						const rows: Array<any> = resp.body['rows'];
 						if (rows) {
 							accept(rows.map(row => {
 								return new this.instance(row['value']);
@@ -201,7 +201,7 @@ class Database<T extends Couch.Document> {
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
 					if (err) {
-						reject(err)
+						reject(err);
 					} else {
 						let exists: boolean;
 						if (resp.body['error']) exists = false;

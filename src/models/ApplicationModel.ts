@@ -10,10 +10,10 @@ abstract class ApplicationModel implements Couch.Document {
 		this.database = new Database<ApplicationModel>(klass);
 		this.dbExists()
 		.then((exists) => {
-			if(!exists.exists) this.MakeDatabase();
+			if (!exists.exists) this.MakeDatabase();
 		})
 		.catch((err: Error) => {
-			console.log("Bad stuff: " + err.message);
+			console.log('Bad stuff: ' + err.message);
 		});
 		if (base) {
 			this._id = base._id;
@@ -21,31 +21,35 @@ abstract class ApplicationModel implements Couch.Document {
 		}
 	}
 
-	private MakeDatabase(){
+	private MakeDatabase() {
 		this.createDB()
 		.then((succ) => {
-			console.log("Needed to create Database. Status: " + JSON.stringify(succ));
-			if (succ.success){
-				let viewProm = this.database.makeViewsFor(this.normalizedModel());
+			console.log('Needed to create Database. Status: ' + JSON.stringify(succ));
+			if (succ.success) {
+				const viewProm = this.database.makeViewsFor(this.normalizedModel());
 				viewProm.then((suc) => {
-					console.log("creating views: " + JSON.stringify(suc));
+					console.log('creating views: ' + JSON.stringify(suc));
 				}).catch(e => {
-					console.log("something bad happened while creating views: " + JSON.stringify(e));
+					console.log('something bad happened while creating views: ' + JSON.stringify(e));
 				});
 			}
 		}).catch((err) => {
-			console.log("Could not create database with error: " + JSON.stringify(err));
+			console.log('Could not create database with error: ' + JSON.stringify(err));
 		});
 	}
+
+	// ================= Model Attributes ================= \\
 
 	public abstract model(): any;
 
 	public normalizedModel(): any {
-		let m = this.model();
+		const m = this.model();
 		m._id = this._id;
 		m._rev = this._rev;
 		return m;
 	}
+
+	// ================ Database Operations ================ \\
 
 	public async cleanUp(): Promise<void> {
 		// return this.database.cleanUp();
