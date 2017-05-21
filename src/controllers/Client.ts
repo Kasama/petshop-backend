@@ -25,13 +25,14 @@ export class Client extends ApplicationController {
 	}
 
 	getAll(): void {
-		// this.doSomething(...args, Client.Model.all);
+		Client.Model.all()
+		.then(this.success)
+		.catch(this.fail);
 	}
 
 	add(): void {
 		let model: ClientModel;
 		model = new ClientModel();
-		console.log("recv params: " + JSON.stringify(this.params));
 		model.age = this.params['age'];
 		model.name = this.params['name'];
 		model.save().then(this.success).catch(this.fail);

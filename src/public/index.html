@@ -2,13 +2,17 @@
 
 <html>
     <head>
+				<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+			  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+			  crossorigin="anonymous"></script>
+				<script src="/index.js" type="text/javascript" charset="utf-8"></script>
         <title>Test</title>
     </head>
     <body>
-        <form action="/clients/add" method="post">
-            <input type="text" name="name" value="yoseph"/>
-            <input type="number" name="age" value="30"/>
-						<input type="submit" id="send"/>
-        </form>
+        <div>
+            <input type="text" name="name" value="yoseph" id="name"/>
+            <input type="number" name="age" value="30" id="age"/>
+						<button id="send">Submit</button>
+        </div>
     </body>
 </html>
