@@ -25,7 +25,24 @@ export class Client extends ApplicationController {
 	}
 
 	getAll(): void {
-		Client.Model.all()
+		Promise.resolve();
+		let resp = [];
+		let promises: Promise<any>[] = [];
+		for (let k in this.params) {
+			console.log("finding param " + k + " = " + this.params[k]);
+			let prom: Promise<any>;
+			if (k) {
+				if (this.params[k] instanceof Array)
+					prom = Client.Model.find(k, this.params[k]);
+				else
+					prom = Client.Model.find(k, [this.params[k]]);
+			} else {
+				prom = Client.Model.all();
+			}
+			promises.push(prom);
+		}
+		Promise.all(promises)
+		.then(vals => [ ...new Set([].concat(...vals))])
 		.then(this.success)
 		.catch(this.fail);
 	}

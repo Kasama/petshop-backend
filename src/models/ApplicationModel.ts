@@ -10,11 +10,7 @@ abstract class ApplicationModel implements Couch.Document {
 		this.database = new Database<ApplicationModel>(klass);
 		this.dbExists()
 		.then((exists) => {
-			if(exists.exists) {
-				console.log("didn't have to create db");
-			} else {
-				this.MakeDatabase();
-			}
+			if(!exists.exists) this.MakeDatabase();
 		})
 		.catch((err: Error) => {
 			console.log("Bad stuff: " + err.message);
@@ -65,6 +61,10 @@ abstract class ApplicationModel implements Couch.Document {
 
 	public async get(id: string): Promise<ApplicationModel> {
 		return this.database.get(id);
+	}
+
+	public async find(what: string, value?: Array<string>): Promise<ApplicationModel[]> {
+		return this.database.find_by(what, value);
 	}
 
 	public async all(): Promise<ApplicationModel[]> {

@@ -79,7 +79,7 @@ class Database<T extends Couch.Document> {
 			language: 'javascript',
 			views: {}
 		};
-		for (let prop in model){
+		for (let prop in model) {
 			if (model.hasOwnProperty(prop)){
 				doc.views = Object.assign(doc.views, this.makeViewFor(prop));
 			}
@@ -142,26 +142,36 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async find_by(what: string, value?: any): Promise<T[]> {
+	public async find_by(what: string, value?: Array<string>): Promise<T[]> {
 		const underscore = what.startsWith('_') ? '' : '_';
 		const by = 'by' + underscore + what;
-		const body = { body: { key: value } };
 		let header;
-		if (value)
+		if (value) {
+			const quotify = value.map(v => {
+				if (v.startsWith('"') && v.endsWith('"'))
+					return v;
+				return '"' + v + '"';
+			});
+			const body = { qs: { keys: "[" + quotify.toString() + "]" } };
 			header = await this.headerFor(this.databaseQuery + by, body);
-		else
-			header = await this.headerFor(this.databaseQuery + by);
+		} else header = await this.headerFor(this.databaseQuery + by);
+		console.log("header: " + JSON.stringify(header));
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
+					console.log("request: " + JSON.stringify(resp.request));
 					if (err) {
 						reject(err);
 					} else {
 						let rows: Array<any> = resp.body['rows'];
-						accept(rows.map(row => {
-							return new this.instance(row['value']);
-						}));
+						if (rows) {
+							accept(rows.map(row => {
+								return new this.instance(row['value']);
+							}));
+						} else {
+							accept([]);
+						}
 					}
 				}
 			);
@@ -170,7 +180,7 @@ class Database<T extends Couch.Document> {
 
 	public async get(id: string): Promise<T> {
 		return new Promise<T>((accept, reject) => {
-			this.find_by('_id', id)
+			this.find_by('_id', [id])
 			.then(acc => accept(acc[0]))
 			.catch(e => reject(e));
 		});

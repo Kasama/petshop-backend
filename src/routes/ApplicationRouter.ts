@@ -45,6 +45,7 @@ export abstract class ApplicationRouter {
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				let params = Object.assign(req.query, req.params);
+				console.log("get params: " + JSON.stringify(params));
 				this.controller.handle(
 					params, successResponse(res), errorResponse(res), func
 				);
