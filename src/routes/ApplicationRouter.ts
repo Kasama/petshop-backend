@@ -1,6 +1,30 @@
 import {Router, Request, Response, NextFunction} from 'express';
 import {ApplicationController} from '../controllers/ApplicationController';
 
+function successResponse(res): (response) => void {
+	return function(response) {
+		let r = response;
+		if (typeof r.map === 'function'){
+			r = r.map(one => {
+				if (typeof one.normalizedModel === 'function') {
+					return one.normalizedModel();
+				}
+				return one;
+			});
+		} else {
+			if (typeof r.normalizedModel === 'function')
+				r = r.normalizedModel();
+		}
+		res.send(r);
+	}
+}
+
+function errorResponse(res): (err) => void {
+	return function(err) {
+		res.send({error: err});
+	}
+}
+
 export abstract class ApplicationRouter {
 	router: Router;
 	controller: ApplicationController;
@@ -13,13 +37,6 @@ export abstract class ApplicationRouter {
 
 	abstract init(): void;
 
-	/*
-	public safetyCheck(method: string) {
-		if (!this.controller.hasMethod(method))
-			throw new Error("Method '" + method + "' does not exist in controller");
-	}
-	*/
-
 	public get(
 		path: string,
 		func: () => void
@@ -27,17 +44,9 @@ export abstract class ApplicationRouter {
 		this.router.get(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
-				console.log("got query: " + JSON.stringify(req.query));
-				console.log("got params: " + JSON.stringify(req.params));
+				let params = Object.assign(req.query, req.params);
 				this.controller.handle(
-					Object.assign(req.query, req.params),
-					(response) => {
-						res.send(response);
-					},
-					(err) => {
-						res.send({error: err});
-					},
-					func
+					params, successResponse(res), errorResponse(res), func
 				);
 			}
 		);
@@ -51,14 +60,7 @@ export abstract class ApplicationRouter {
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(
-					req.body,
-					(response) => {
-						res.send(response);
-					},
-					(err) => {
-						res.send({error: err});
-					},
-					func
+					req.body, successResponse(res), errorResponse(res), func
 				);
 			}
 		);
@@ -72,14 +74,7 @@ export abstract class ApplicationRouter {
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(
-					req.params,
-					(response) => {
-						res.send(response);
-					},
-					(err) => {
-						res.send({error: err});
-					},
-					func
+					req.params, successResponse(res), errorResponse(res), func
 				);
 			}
 		);

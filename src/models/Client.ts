@@ -5,8 +5,12 @@ class Client extends ApplicationModel {
 	public name: string;
 	public age: number;
 
-	constructor() {
-		super(Client);
+	constructor(base?: any) {
+		super(Client, base);
+		if (base) {
+			this.name = base.name;
+			this.age = base.age;
+		}
 	}
 
 	model(): any {

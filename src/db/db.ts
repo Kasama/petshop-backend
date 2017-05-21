@@ -4,6 +4,7 @@ import * as request from 'request';
 const url = 'http://localhost:5984';
 const dbUser = 'admin';
 const dbPass = 'admin';
+const designDoc = '_design/docs';
 
 // Needed for couchdb views
 var emit: (key: string, value: any) => void;
@@ -38,10 +39,16 @@ class Database<T extends Couch.Document> {
 
 	databaseName: string;
 	databasePath: string;
+	databaseView: string;
+	databaseQuery: string;
+	instance: { new(base?: any): T };
 
-	constructor(instance: { new(): T }) {
+	constructor(instance: { new(base?: any): T }) {
+		this.instance = instance;
 		this.databaseName = instance.name.toLowerCase();
 		this.databasePath = this.databaseName + '/';
+		this.databaseView = this.databasePath + designDoc
+		this.databaseQuery = this.databaseView + '/_view/';
 	}
 
 	private async headerFor(path: string = '', form: any = {}): Promise<request.Options> {
@@ -60,25 +67,24 @@ class Database<T extends Couch.Document> {
 		const underscore = property.startsWith('_') ? '' : '_';
 		const name = "by" + underscore + property;
 		const mapFunc = "function(doc) { emit(doc." + property + ", doc); }";
-		const redFunc = '';
+		const redFunc = "";
 		let view = {};
 		view[name] = { map: mapFunc };
 		return view;
 	}
 
 	public async makeViewsFor(model: any): Promise<Couch.Status> {
-		const designDoc = '_design/docs';
-		let views = {
+		let doc = {
 			_id: designDoc,
 			language: 'javascript',
 			views: {}
 		};
 		for (let prop in model){
 			if (model.hasOwnProperty(prop)){
-				views.views = Object.assign(views.views, this.makeViewFor(prop));
+				doc.views = Object.assign(doc.views, this.makeViewFor(prop));
 			}
 		}
-		const header = await this.headerFor(this.databasePath + designDoc, {body: views});
+		const header = await this.headerFor(this.databaseView, {body: doc});
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
 				header,
@@ -136,29 +142,15 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async get(id: string): Promise<T> {
-		const header = await this.headerFor(this.databasePath + id);
-		return new Promise<T>((accept, reject) => {
-			request.get(
-				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
-					if (err) {
-						reject(err);
-					} else {
-						if (resp.body['error']) {
-							// TODO Catch it ouside
-							reject(new Error(resp.body['reason']));
-						} else {
-							accept(resp.body);
-						}
-					}
-				}
-			);
-		});
-	}
-
-	public async all(): Promise<T[]> {
-		const header = await this.headerFor(this.databasePath + '_all_docs');
+	public async find_by(what: string, value?: any): Promise<T[]> {
+		const underscore = what.startsWith('_') ? '' : '_';
+		const by = 'by' + underscore + what;
+		const body = { body: { key: value } };
+		let header;
+		if (value)
+			header = await this.headerFor(this.databaseQuery + by, body);
+		else
+			header = await this.headerFor(this.databaseQuery + by);
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
@@ -166,14 +158,29 @@ class Database<T extends Couch.Document> {
 					if (err) {
 						reject(err);
 					} else {
-						if (resp.body['error']) {
-							reject(new Error(resp.body['reason']));
-						} else {
-							accept(resp.body['rows']);
-						}
+						let rows: Array<any> = resp.body['rows'];
+						accept(rows.map(row => {
+							return new this.instance(row['value']);
+						}));
 					}
 				}
 			);
+		});
+	}
+
+	public async get(id: string): Promise<T> {
+		return new Promise<T>((accept, reject) => {
+			this.find_by('_id', id)
+			.then(acc => accept(acc[0]))
+			.catch(e => reject(e));
+		});
+	}
+
+	public async all(): Promise<T[]> {
+		return new Promise<T[]>((accept, reject) => {
+			this.find_by('_id')
+			.then(acc => accept(acc))
+			.catch(e => reject(e));
 		});
 	}
 
@@ -186,9 +193,10 @@ class Database<T extends Couch.Document> {
 					if (err) {
 						reject(err)
 					} else {
+						let error = resp.body['error'];
 						accept({
 							database: this.databaseName,
-							exists: resp.body['error'] === undefined,
+							exists: error,
 							message: resp.body['reason']
 						});
 					}

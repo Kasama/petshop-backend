@@ -6,22 +6,26 @@ abstract class ApplicationModel implements Couch.Document {
 	public _id: string;
 	public _rev: string;
 
-	constructor(klass) {
+	constructor(klass?: { new(): ApplicationModel }, base?: any) {
 		this.database = new Database<ApplicationModel>(klass);
 		this.dbExists()
 		.then((exists) => {
 			if(exists.exists) {
 				console.log("didn't have to create db");
 			} else {
-				this.onCreateDB();
+				this.MakeDatabase();
 			}
 		})
-		.catch((err) => {
-			console.log("Bad stuff: " + err);
+		.catch((err: Error) => {
+			console.log("Bad stuff: " + err.message);
 		});
+		if (base) {
+			this._id = base._id;
+			this._rev = base._rev;
+		}
 	}
 
-	private onCreateDB(){
+	private MakeDatabase(){
 		this.createDB()
 		.then((succ) => {
 			console.log("Needed to create Database. Status: " + JSON.stringify(succ));
@@ -40,7 +44,7 @@ abstract class ApplicationModel implements Couch.Document {
 
 	public abstract model(): any;
 
-	private normalizedModel(): any {
+	public normalizedModel(): any {
 		let m = this.model();
 		m._id = this._id;
 		m._rev = this._rev;
