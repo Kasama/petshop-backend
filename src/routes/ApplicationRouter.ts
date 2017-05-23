@@ -21,7 +21,10 @@ function successResponse(res): (response) => void {
 
 function errorResponse(res): (err) => void {
 	return function(err) {
-		res.send({error: err});
+		if (err.message)
+			res.send({error: err.message});
+		else
+			res.send({error: err});
 	};
 }
 
@@ -71,7 +74,7 @@ export abstract class ApplicationRouter {
 		path: string,
 		func: () => void
 	) {
-		this.router.get(
+		this.router.delete(
 			path,
 			(req: Request, res: Response, next: NextFunction) => {
 				this.controller.handle(

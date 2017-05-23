@@ -18,29 +18,34 @@ export class Client extends ApplicationController {
 	}
 
 	get(): void {
-		console.log('this is: ' + JSON.stringify(this));
-		Client.Model.get(this.params['id'])
+		Client.Model.get(this.params['_id'])
 		.then(this.success)
 		.catch(this.fail);
 	}
 
+	delete(): void {
+		const prom = Client.Model.get(this.params['_id']);
+		prom.then(model => {
+			model.delete().then(this.success).catch(this.fail);
+		});
+		prom.catch(this.fail);
+	}
+
 	getAll(): void {
-		Promise.resolve();
 		const resp = [];
 		const promises: Promise<any>[] = [];
+		let all = true;
 		for (const k in this.params) {
-			console.log('finding param ' + k + ' = ' + this.params[k]);
-			let prom: Promise<any>;
-			if (k) {
-				if (this.params[k] instanceof Array)
-					prom = Client.Model.find(k, this.params[k]);
-				else
-					prom = Client.Model.find(k, [this.params[k]]);
-			} else {
-				prom = Client.Model.all();
-			}
-			promises.push(prom);
+			all = false;
+			let params;
+			if (this.params[k] instanceof Array)
+				params = this.params[k];
+			else
+				params = [this.params[k]];
+
+			promises.push(Client.Model.find(k, params));
 		}
+		if (all) promises.push(Client.Model.all());
 		Promise.all(promises)
 		.then(vals => [ ...new Set([].concat(...vals))])
 		.then(this.success)

@@ -14,7 +14,8 @@ export class Client extends ApplicationRouter {
 		this.get('/create', this.controller.createDB);
 		this.get('/exists', this.controller.exists);
 		this.post('/add', this.controller.add);
-		this.get('/:id', this.controller.get);
+		this.get('/:_id', this.controller.get);
+		this.delete('/:_id', this.controller.delete);
 	}
 }
 

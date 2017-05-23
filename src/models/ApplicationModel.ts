@@ -84,7 +84,13 @@ abstract class ApplicationModel implements Couch.Document {
 	}
 
 	public async delete(): Promise<Couch.Status> {
-		return this.database.delete(this.normalizedModel());
+		return new Promise<Couch.Status>((accept, reject) => {
+			this.database.delete(this.normalizedModel())
+			.then(status => {
+				if (status.success) status.data = this.normalizedModel();
+				accept(status);
+			}).catch(reject);
+		});
 	}
 
 }

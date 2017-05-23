@@ -1,7 +1,7 @@
 import * as request from 'request';
 
-// const url = 'http://191.189.112.147:5984';
-const url = 'http://localhost:5984';
+const url = 'http://191.189.112.147:5984';
+// const url = 'http://localhost:5984';
 const dbUser = 'admin';
 const dbPass = 'admin';
 const designDoc = '_design/docs';
@@ -75,10 +75,10 @@ class Database<T extends Couch.Document> {
 
 	private makeViewFor(view: Couch.View): any {
 		const v = {};
-		v[view.name]['map'] = view.map;
-		if (view.reduce)
+		v[view.name] = { map: view.map };
+		if (view['reduce'])
 			v[view.name]['reduce'] = view.reduce;
-		return view;
+		return v;
 	}
 
 	public async makeViewsFor(model: any, extra?: Couch.View[]): Promise<Couch.Status> {
@@ -94,7 +94,7 @@ class Database<T extends Couch.Document> {
 			}
 		}
 
-		extra.forEach((v) => {
+		if (extra) extra.forEach((v) => {
 			doc.views = Object.assign(doc.views, this.makeViewFor(v));
 		});
 
@@ -169,12 +169,10 @@ class Database<T extends Couch.Document> {
 			const body = { qs: { keys: '[' + quotify.toString() + ']' } };
 			header = await this.headerFor(this.databaseQuery + by, body);
 		} else header = await this.headerFor(this.databaseQuery + by);
-		console.log('header: ' + JSON.stringify(header));
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
 				(err: any, resp: request.RequestResponse, body: any) => {
-					console.log('request: ' + JSON.stringify(resp.request));
 					if (err) {
 						reject(err);
 					} else {
@@ -195,7 +193,12 @@ class Database<T extends Couch.Document> {
 	public async get(id: string): Promise<T> {
 		return new Promise<T>((accept, reject) => {
 			this.find_by('_id', [id])
-			.then(acc => accept(acc[0]))
+			.then(acc => {
+				if (acc[0])
+					accept(acc[0]);
+				else
+					reject(new Error('member does not exist'));
+			})
 			.catch(e => reject(e));
 		});
 	}
