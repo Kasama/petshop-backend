@@ -25,9 +25,9 @@ export namespace Couch {
 		data?: any;
 	}
 	export interface View {
-		_id: string;
-		_rev: string;
-		views: any;
+		name: string;
+		map: string;
+		reduce?: string;
 	}
 }
 
@@ -63,27 +63,41 @@ class Database<T extends Couch.Document> {
 		return Object.assign(ret, form);
 	}
 
-	private makeViewFor(property: string): any {
+	makeDefaultViewFor(property: string): any {
 		const underscore = property.startsWith('_') ? '' : '_';
 		const name = 'by' + underscore + property;
 		const mapFunc = 'function(doc) { emit(doc.' + property + ', doc); }';
-		const redFunc = '';
-		const view = {};
-		view[name] = { map: mapFunc };
+		return this.makeViewFor({
+			name: name,
+			map: mapFunc
+		});
+	}
+
+	private makeViewFor(view: Couch.View): any {
+		const v = {};
+		v[view.name]['map'] = view.map;
+		if (view.reduce)
+			v[view.name]['reduce'] = view.reduce;
 		return view;
 	}
 
-	public async makeViewsFor(model: any): Promise<Couch.Status> {
+	public async makeViewsFor(model: any, extra?: Couch.View[]): Promise<Couch.Status> {
 		const doc = {
 			_id: designDoc,
 			language: 'javascript',
 			views: {}
 		};
+
 		for (const prop in model) {
 			if (model.hasOwnProperty(prop)) {
-				doc.views = Object.assign(doc.views, this.makeViewFor(prop));
+				doc.views = Object.assign(doc.views, this.makeDefaultViewFor(prop));
 			}
 		}
+
+		extra.forEach((v) => {
+			doc.views = Object.assign(doc.views, this.makeViewFor(v));
+		});
+
 		const header = await this.headerFor(this.databaseView, {body: doc});
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
@@ -191,6 +205,23 @@ class Database<T extends Couch.Document> {
 			this.find_by('_id')
 			.then(acc => accept(acc))
 			.catch(e => reject(e));
+		});
+	}
+
+	public async delete(doc: Couch.Document): Promise<Couch.Status> {
+		const data = { qs: {rev: doc._rev } };
+		const header = await this.headerFor(this.databasePath + doc._id, data);
+		return new Promise<Couch.Status>((accept, reject) => {
+			request.delete(
+				header,
+				(err: any, resp: request.RequestResponse, body: any) => {
+					if (err) {
+						reject(err);
+					} else {
+						accept({ success: true });
+					}
+				}
+			);
 		});
 	}
 

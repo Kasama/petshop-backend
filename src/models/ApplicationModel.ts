@@ -3,11 +3,13 @@ import Database, { Couch } from '../db/db';
 abstract class ApplicationModel implements Couch.Document {
 
 	private database: Database<ApplicationModel>;
+	private views: any[];
 	public _id: string;
 	public _rev: string;
 
 	constructor(klass?: { new(): ApplicationModel }, base?: any) {
 		this.database = new Database<ApplicationModel>(klass);
+		this.generateExtraViews();
 		this.dbExists()
 		.then((exists) => {
 			if (!exists.exists) this.MakeDatabase();
@@ -26,7 +28,7 @@ abstract class ApplicationModel implements Couch.Document {
 		.then((succ) => {
 			console.log('Needed to create Database. Status: ' + JSON.stringify(succ));
 			if (succ.success) {
-				const viewProm = this.database.makeViewsFor(this.normalizedModel());
+				const viewProm = this.database.makeViewsFor(this.normalizedModel(), this.views);
 				viewProm.then((suc) => {
 					console.log('creating views: ' + JSON.stringify(suc));
 				}).catch(e => {
@@ -48,6 +50,8 @@ abstract class ApplicationModel implements Couch.Document {
 		m._rev = this._rev;
 		return m;
 	}
+
+	protected generateExtraViews(): void { this.views = []; }
 
 	// ================ Database Operations ================ \\
 
@@ -77,6 +81,10 @@ abstract class ApplicationModel implements Couch.Document {
 
 	public async save(): Promise<Couch.Status> {
 		return this.database.save(this.normalizedModel());
+	}
+
+	public async delete(): Promise<Couch.Status> {
+		return this.database.delete(this.normalizedModel());
 	}
 
 }
