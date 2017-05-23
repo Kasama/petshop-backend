@@ -156,7 +156,7 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async find_by(what: string, value?: Array<string>): Promise<T[]> {
+	public async find_by(what: string, limit?: number, skip?: number, value?: Array<string>): Promise<T[]> {
 		const underscore = what.startsWith('_') ? '' : '_';
 		const by = 'by' + underscore + what;
 		let header;
@@ -167,8 +167,19 @@ class Database<T extends Couch.Document> {
 				return '"' + v + '"';
 			});
 			const body = { qs: { keys: '[' + quotify.toString() + ']' } };
+			if (limit) body.qs['limit'] = limit;
+			if (skip) body.qs['skip'] = skip;
 			header = await this.headerFor(this.databaseQuery + by, body);
-		} else header = await this.headerFor(this.databaseQuery + by);
+		} else {
+			if (limit || skip) {
+				const body = { qs: {} };
+				if (limit) body.qs['limit'] = limit;
+				if (skip) body.qs['skip'] = skip;
+				header = await this.headerFor(this.databaseQuery + by, body);
+			} else {
+				header = await this.headerFor(this.databaseQuery + by);
+			}
+		}
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
@@ -192,7 +203,7 @@ class Database<T extends Couch.Document> {
 
 	public async get(id: string): Promise<T> {
 		return new Promise<T>((accept, reject) => {
-			this.find_by('_id', [id])
+			this.find_by('_id', undefined, undefined, [id])
 			.then(acc => {
 				if (acc[0])
 					accept(acc[0]);
@@ -203,9 +214,9 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async all(): Promise<T[]> {
+	public async all(limit?: number, skip?: number): Promise<T[]> {
 		return new Promise<T[]>((accept, reject) => {
-			this.find_by('_id')
+			this.find_by('_id', limit, skip)
 			.then(acc => accept(acc))
 			.catch(e => reject(e));
 		});

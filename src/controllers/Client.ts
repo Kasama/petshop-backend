@@ -35,6 +35,20 @@ export class Client extends ApplicationController {
 		const resp = [];
 		const promises: Promise<any>[] = [];
 		let all = true;
+		let limit = undefined;
+		let skip = undefined;
+		if (this.params['limit']) {
+			if (this.params['limit'][0])
+				limit = parseInt(this.params['limit'][0]);
+			else limit = parseInt(this.params['limit']);
+			delete this.params['limit'];
+		}
+		if (this.params['skip']) {
+			if (this.params['skip'][0])
+				skip = parseInt(this.params['skip'][0]);
+			else skip = parseInt(this.params['skip']);
+			delete this.params['skip'];
+		}
 		for (const k in this.params) {
 			all = false;
 			let params;
@@ -43,9 +57,9 @@ export class Client extends ApplicationController {
 			else
 				params = [this.params[k]];
 
-			promises.push(Client.Model.find(k, params));
+			promises.push(Client.Model.find(k, limit, skip, params));
 		}
-		if (all) promises.push(Client.Model.all());
+		if (all) promises.push(Client.Model.all(limit, skip));
 		Promise.all(promises)
 		.then(vals => [ ...new Set([].concat(...vals))])
 		.then(this.success)

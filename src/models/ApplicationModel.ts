@@ -71,12 +71,12 @@ abstract class ApplicationModel implements Couch.Document {
 		return this.database.get(id);
 	}
 
-	public async find(what: string, value?: Array<string>): Promise<ApplicationModel[]> {
-		return this.database.find_by(what, value);
+	public async find(what: string, limit?: number, skip?: number, value?: Array<string>): Promise<ApplicationModel[]> {
+		return this.database.find_by(what, limit, skip, value);
 	}
 
-	public async all(): Promise<ApplicationModel[]> {
-		return this.database.all();
+	public async all(limit?: number, skip?: number): Promise<ApplicationModel[]> {
+		return this.database.all(limit, skip);
 	}
 
 	public async save(): Promise<Couch.Status> {
