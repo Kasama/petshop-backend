@@ -73,6 +73,10 @@ export class Client extends ApplicationController {
 		model.name = this.params['name'];
 		model.save().then(this.success).catch(this.fail);
 	}
+
+	update(): void {
+	}
+
 }
 
 export default Client;

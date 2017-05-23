@@ -2,7 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import {ApplicationController} from '../controllers/ApplicationController';
 
 function successResponse(res): (response) => void {
-	return function(response) {
+	return (response) => {
 		let r = response;
 		if (typeof r.map === 'function') {
 			r = r.map(one => {
@@ -20,7 +20,7 @@ function successResponse(res): (response) => void {
 }
 
 function errorResponse(res): (err) => void {
-	return function(err) {
+	return (err) => {
 		if (err.message)
 			res.send({error: err.message});
 		else
@@ -40,48 +40,28 @@ export abstract class ApplicationRouter {
 
 	abstract init(): void;
 
-	public get(
-		path: string,
-		func: () => void
-	) {
-		this.router.get(
-			path,
-			(req: Request, res: Response, next: NextFunction) => {
-				const params = Object.assign(req.query, req.params);
-				console.log('get params: ' + JSON.stringify(params));
-				this.controller.handle(
-					params, successResponse(res), errorResponse(res), func
-				);
-			}
-		);
+	private makeCallbackFor(func: () => void):
+		(req: Request, res: Response, next: NextFunction) => void {
+		return (req: Request, res: Response, next: NextFunction) => {
+			const params = Object.assign(req.params, req.body, req.query);
+			this.controller.handle(params, successResponse(res), errorResponse(res), func);
+		};
 	}
 
-	public post(
-		path: string,
-		func: () => void
-	) {
-		this.router.post(
-			path,
-			(req: Request, res: Response, next: NextFunction) => {
-				this.controller.handle(
-					req.body, successResponse(res), errorResponse(res), func
-				);
-			}
-		);
+	public get(path: string, func: () => void): void {
+		this.router.get(path, this.makeCallbackFor(func));
 	}
 
-	public delete(
-		path: string,
-		func: () => void
-	) {
-		this.router.delete(
-			path,
-			(req: Request, res: Response, next: NextFunction) => {
-				this.controller.handle(
-					req.params, successResponse(res), errorResponse(res), func
-				);
-			}
-		);
+	public put(path: string, func: () => void): void {
+		this.router.put(path, this.makeCallbackFor(func));
+	}
+
+	public post(path: string, func: () => void): void {
+		this.router.post(path, this.makeCallbackFor(func));
+	}
+
+	public delete(path: string, func: () => void): void {
+		this.router.delete(path, this.makeCallbackFor(func));
 	}
 }
 
