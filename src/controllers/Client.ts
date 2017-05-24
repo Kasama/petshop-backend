@@ -17,6 +17,15 @@ export class Client extends ApplicationController {
 		.catch(this.fail);
 	}
 
+	uploadPicture(): void {
+		const id = this.params['_id'];
+		const filepath = this.params['file'];
+		console.log('got file at: ' + filepath);
+		Client.Model.uploadFile(id, filepath)
+		.then(this.success)
+		.catch(this.fail);
+	}
+
 	get(): void {
 		Client.Model.get(this.params['_id'])
 		.then(this.success)

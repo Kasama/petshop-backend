@@ -1,10 +1,12 @@
 import * as request from 'request';
+import * as fs from 'fs';
 
 const url = 'http://191.189.112.147:5984';
 // const url = 'http://localhost:5984';
 const dbUser = 'admin';
 const dbPass = 'admin';
 const designDoc = '_design/docs';
+const attachment = 'attach';
 
 // Needed for couchdb views
 const emit: (key: string, value: any) => void = () => {};
@@ -102,7 +104,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {
@@ -122,11 +124,29 @@ class Database<T extends Couch.Document> {
 		return new Promise<string>((accept, reject) => {
 			request.get(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) reject(err);
 					else accept(resp.body['uuids'][0]);
 				}
 			);
+		});
+	}
+
+	public async saveAttachment(id: string, filepath: string): Promise<Couch.Status> {
+		console.log('going to save attachment ' + filepath + ' on ' + id);
+		const header = await this.headerFor(this.databasePath + id + '/' + attachment);
+		return new Promise<Couch.Status>((accept, reject) => {
+			fs.createReadStream(filepath).pipe(request.put(
+				header,
+				(err, resp, body) => {
+					if (err) { reject(err);
+					} else {
+						const status = {success: resp.body['ok']} as Couch.Status;
+						if (resp.body['reason']) status.message = resp.body['reason'];
+						accept(status);
+					}
+				}
+			));
 		});
 	}
 
@@ -142,7 +162,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {
@@ -183,7 +203,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {
@@ -228,7 +248,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.delete(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {
@@ -244,7 +264,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<Couch.Existence>((accept, reject) => {
 			request.get(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {
@@ -267,7 +287,7 @@ class Database<T extends Couch.Document> {
 		return new Promise<Couch.Status>((accept, reject) => {
 			request.put(
 				header,
-				(err: any, resp: request.RequestResponse, body: any) => {
+				(err, resp, body) => {
 					if (err) {
 						reject(err);
 					} else {

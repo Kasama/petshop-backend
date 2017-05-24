@@ -1,4 +1,28 @@
 $(document).ready(() => {
+	let files;
+	$('input#picture').on('change', e => {
+		files = e.target.files;
+	});
+	$('button#sendImage').click(() => {
+		let data = new FormData();
+		$.each(files, (k, v) => {
+			data.append(k, v);
+		});
+		$.ajax('/clients/345cae88b2a70130c996b44491004ad2/picture', {
+			cache: false,
+			data: data,
+			dataType: 'json',
+			processData: false,
+			contentType: false,
+			method: 'POST',
+			success: (result, status, xhr) => {
+				alert("got result " + JSON.stringify(result));
+			},
+			error: (xhr, status, err) => {
+				alert("got error " + JSON.stringify(err));
+			}
+		});
+	});
 	$('button#send').click(() => {
 		let name = $('input#name').val();
 		let age = $('input#age').val();

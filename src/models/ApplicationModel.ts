@@ -3,7 +3,7 @@ import Database, { Couch } from '../db/db';
 abstract class ApplicationModel implements Couch.Document {
 
 	private database: Database<ApplicationModel>;
-	private views: any[];
+	private views: Couch.View[];
 	public _id: string;
 	public _rev: string;
 
@@ -64,12 +64,6 @@ abstract class ApplicationModel implements Couch.Document {
 
 	// ================ Model Operations ================ \\
 
-	public permit(data: any, ...permitted: string[]): any {
-		const safe_data = {};
-		permitted.forEach(p => { safe_data[p] = data[p]; });
-		return safe_data;
-	}
-
 	public update(data: any): void {
 		if (data) this.fields().forEach(field => {
 			if (data[field]) {
@@ -102,6 +96,10 @@ abstract class ApplicationModel implements Couch.Document {
 
 	public async all(limit?: number, skip?: number): Promise<ApplicationModel[]> {
 		return this.database.all(limit, skip);
+	}
+
+	public async uploadFile(id: string, filepath: string): Promise<Couch.Status> {
+		return this.database.saveAttachment(id, filepath);
 	}
 
 	public async save(): Promise<Couch.Status> {
