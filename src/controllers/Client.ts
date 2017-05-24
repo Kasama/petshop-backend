@@ -69,12 +69,17 @@ export class Client extends ApplicationController {
 	add(): void {
 		let model: ClientModel;
 		model = new ClientModel();
-		model.age = this.params['age'];
-		model.name = this.params['name'];
+		model.update(this.params);
 		model.save().then(this.success).catch(this.fail);
 	}
 
 	update(): void {
+		Client.Model.get(this.params['_id'])
+		.then(model => {
+			model.update(this.params);
+			model.save();
+			this.success(model);
+		}).catch(this.fail);
 	}
 
 }

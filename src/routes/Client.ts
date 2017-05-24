@@ -14,7 +14,7 @@ export class Client extends ApplicationRouter {
 		this.get('/:_id', this.controller.get);
 		this.delete('/:_id', this.controller.delete);
 		this.post('/add', this.controller.add);
-		this.put('/:id', this.controller.update);
+		this.put('/:_id', this.controller.update);
 	}
 }
 

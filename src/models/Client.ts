@@ -7,19 +7,14 @@ class Client extends ApplicationModel {
 
 	constructor(base?: any) {
 		super(Client, base);
-		if (base) {
-			this.name = base.name;
-			this.age = base.age;
-		}
 	}
 
-	model(): any {
-		return {
-			name: this.name,
-			age: this.age
-		}
+	fields(): string[] {
+		return [
+			'name',
+			'age',
+		];
 	}
-
 }
 
 export default Client;

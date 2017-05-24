@@ -18,9 +18,10 @@ abstract class ApplicationModel implements Couch.Document {
 			console.log('Bad stuff: ' + err.message);
 		});
 		if (base) {
-			this._id = base._id;
-			this._rev = base._rev;
+			if (base._id) this._id = base._id;
+			if (base._rev) this._rev = base._rev;
 		}
+		this.update(base);
 	}
 
 	private MakeDatabase() {
@@ -42,7 +43,15 @@ abstract class ApplicationModel implements Couch.Document {
 
 	// ================= Model Attributes ================= \\
 
-	public abstract model(): any;
+	protected abstract fields(): string[];
+
+	public model(): any {
+		const m = {};
+		this.fields().forEach(field => {
+			m[field] = this[field];
+		});
+		return m;
+	}
 
 	public normalizedModel(): any {
 		const m = this.model();
@@ -52,6 +61,22 @@ abstract class ApplicationModel implements Couch.Document {
 	}
 
 	protected generateExtraViews(): void { this.views = []; }
+
+	// ================ Model Operations ================ \\
+
+	public permit(data: any, ...permitted: string[]): any {
+		const safe_data = {};
+		permitted.forEach(p => { safe_data[p] = data[p]; });
+		return safe_data;
+	}
+
+	public update(data: any): void {
+		if (data) this.fields().forEach(field => {
+			if (data[field]) {
+				this[field] = data[field];
+			}
+		});
+	}
 
 	// ================ Database Operations ================ \\
 
@@ -80,7 +105,9 @@ abstract class ApplicationModel implements Couch.Document {
 	}
 
 	public async save(): Promise<Couch.Status> {
-		return this.database.save(this.normalizedModel());
+		const status = await this.database.save(this.normalizedModel());
+		this._rev = status.data._rev;
+		return status;
 	}
 
 	public async delete(): Promise<Couch.Status> {
