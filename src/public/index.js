@@ -1,14 +1,11 @@
 $(document).ready(() => {
-	let files;
-	$('input#picture').on('change', e => {
-		files = e.target.files;
-	});
 	$('button#sendImage').click(() => {
+		let file = $('#picture')[0].files[0];
 		let data = new FormData();
-		$.each(files, (k, v) => {
-			data.append(k, v);
-		});
-		$.ajax('/clients/345cae88b2a70130c996b44491004ad2/picture', {
+		data.append('image', file, file.name);
+		console.log(data);
+		console.log(data.image);
+		$.ajax('/clients/345cae88b2a70130c996b44491003b57/picture', {
 			cache: false,
 			data: data,
 			dataType: 'json',
