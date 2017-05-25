@@ -10,12 +10,12 @@ export class Client extends ApplicationRouter {
 	}
 
 	init() {
-		this.get('/', this.controller.getAll);
+		this.get('/', this.controller.all);
 		this.get('/:_id', this.controller.get);
 		this.delete('/:_id', this.controller.delete);
 		this.put('/:_id', this.controller.update);
 		this.post('/add', this.controller.add);
-		this.post_image('/:_id/picture', this.controller.uploadPicture);
+		this.post_image('/:_id/picture', this.controller.uploadFile);
 	}
 }
 
