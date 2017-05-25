@@ -1,19 +1,23 @@
 import ApplicationModel from './ApplicationModel';
 
-class Client extends ApplicationModel {
+class Product extends ApplicationModel {
 
 	public name: string;
-	public age: number;
+	public description: number;
+	public price: number;
+	public stock: number;
 	public picture: string;
 
 	constructor(base?: any) {
-		super(Client, base);
+		super(Product, base);
 	}
 
 	fields(): string[] {
 		return [
 			'name',
-			'age',
+			'description',
+			'price',
+			'stock',
 		];
 	}
 
@@ -22,4 +26,4 @@ class Client extends ApplicationModel {
 	}
 }
 
-export default Client;
+export default Product;

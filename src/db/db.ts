@@ -148,7 +148,6 @@ class Database<T extends Couch.Document> {
 			fs.createReadStream(file.path).pipe(request.put(
 				header,
 				(err, resp, body) => {
-					console.log('requested:---\n' + JSON.stringify(resp.request) + '\n---');
 					if (err) { reject(err);
 					} else {
 						const status = {success: resp.body['ok']} as Couch.Status;
@@ -177,7 +176,7 @@ class Database<T extends Couch.Document> {
 					if (err) {
 						reject(err);
 					} else {
-						const status = {success: resp.body['ok']} as Couch.Status;
+						const status = {success: resp.body['ok'], data: data} as Couch.Status;
 						if (resp.body['reason'])
 							status.message = resp.body['reason'];
 						accept(status);

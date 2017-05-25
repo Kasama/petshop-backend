@@ -1,18 +1,18 @@
-import ClientModel from '../models/Client';
+import ProductModel from '../models/Product';
 import ApplicationController from './ApplicationController';
 
-export class Client extends ApplicationController {
+export class Product extends ApplicationController {
 
-	static Model = new ClientModel();
+	static Model = new ProductModel();
 
 	exists(): void {
-		Client.Model.dbExists()
+		Product.Model.dbExists()
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	createDB(): void {
-		Client.Model.createDB()
+		Product.Model.createDB()
 		.then(this.success)
 		.catch(this.fail);
 	}
@@ -20,19 +20,19 @@ export class Client extends ApplicationController {
 	uploadPicture(): void {
 		const id = this.params['_id'];
 		const file = this.params['file'];
-		Client.Model.uploadFile(id, file)
+		Product.Model.uploadFile(id, file)
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	get(): void {
-		Client.Model.get(this.params['_id'])
+		Product.Model.get(this.params['_id'])
 		.then(this.success)
 		.catch(this.fail);
 	}
 
 	delete(): void {
-		const prom = Client.Model.get(this.params['_id']);
+		const prom = Product.Model.get(this.params['_id']);
 		prom.then(model => {
 			model.delete().then(this.success).catch(this.fail);
 		});
@@ -65,9 +65,9 @@ export class Client extends ApplicationController {
 			else
 				params = [this.params[k]];
 
-			promises.push(Client.Model.find(k, limit, skip, params));
+			promises.push(Product.Model.find(k, limit, skip, params));
 		}
-		if (all) promises.push(Client.Model.all(limit, skip));
+		if (all) promises.push(Product.Model.all(limit, skip));
 		Promise.all(promises)
 		.then(vals => [ ...new Set([].concat(...vals))])
 		.then(this.success)
@@ -75,14 +75,14 @@ export class Client extends ApplicationController {
 	}
 
 	add(): void {
-		let model: ClientModel;
-		model = new ClientModel();
+		let model: ProductModel;
+		model = new ProductModel();
 		model.update(this.params);
 		model.save().then(this.success).catch(this.fail);
 	}
 
 	update(): void {
-		Client.Model.get(this.params['_id'])
+		Product.Model.get(this.params['_id'])
 		.then(model => {
 			model.update(this.params);
 			model.save();
@@ -92,4 +92,4 @@ export class Client extends ApplicationController {
 
 }
 
-export default Client;
+export default Product;

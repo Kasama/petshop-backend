@@ -1,4 +1,5 @@
 import Database, { Couch } from '../db/db';
+import * as fs from 'fs';
 
 abstract class ApplicationModel implements Couch.Document {
 
@@ -44,10 +45,13 @@ abstract class ApplicationModel implements Couch.Document {
 	// ================= Model Attributes ================= \\
 
 	protected abstract fields(): string[];
+	protected picture_attr(): string|undefined {
+		return undefined;
+	}
 
 	public model(): any {
 		const m = {};
-		this.fields().forEach(field => {
+		this.normalizedFields().forEach(field => {
 			m[field] = this[field];
 		});
 		return m;
@@ -60,12 +64,19 @@ abstract class ApplicationModel implements Couch.Document {
 		return m;
 	}
 
+	public normalizedFields(): string[] {
+		const fields = this.fields();
+		if (this.picture_attr())
+			fields.push(this.picture_attr());
+		return fields;
+	}
+
 	protected generateExtraViews(): void { this.views = []; }
 
 	// ================ Model Operations ================ \\
 
 	public update(data: any): void {
-		if (data) this.fields().forEach(field => {
+		if (data) this.normalizedFields().forEach(field => {
 			if (data[field]) {
 				this[field] = data[field];
 			}
@@ -99,11 +110,29 @@ abstract class ApplicationModel implements Couch.Document {
 	}
 
 	public async uploadFile(id: string, file: Express.Multer.File): Promise<Couch.Status> {
-		return this.database.saveAttachment(id, file);
+		// Saving file locally instead of on the Database
+		// FIXME: Put file as an attachment to the database
+		const publicPath = 'dist/public/';
+		const newname = file.filename + file.mimetype.replace('image/', '.');
+		fs.rename(file.path, publicPath + newname, () => {});
+		const el = await this.get(id);
+		if (el.picture_attr()) {
+			console.log('attr: ' + JSON.stringify(el));
+			console.log('deleting file: ' + el[el.picture_attr()]);
+			fs.unlink(publicPath + el[el.picture_attr()], () => {});
+			el[this.picture_attr()] = newname;
+			return el.save();
+		} else {
+			fs.unlink(publicPath + newname, () => {});
+			return Promise.reject('Model does not have a picture field');
+		}
 	}
 
 	public async save(): Promise<Couch.Status> {
-		const status = await this.database.save(this.normalizedModel());
+		const model = this.normalizedModel();
+		if (this.picture_attr())
+			model[this.picture_attr()] = this[this.picture_attr()];
+		const status = await this.database.save(model);
 		this._rev = status.data._rev;
 		return status;
 	}

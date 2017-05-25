@@ -2,7 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import {ApplicationController} from '../controllers/ApplicationController';
 import * as Multer from 'multer';
 
-const tmpImagePath = 'tmpFiles/';
+const tmpImagePath = 'dist/public/';
 
 const imageUpload = Multer({
 	dest: tmpImagePath,
@@ -64,7 +64,9 @@ export abstract class ApplicationRouter {
 		(req: Request, res: Response, next: NextFunction) => void {
 		return (req: Request, res: Response, next: NextFunction) => {
 			const params = Object.assign(req.params, req.body, req.query);
-			if (req.file) params['file'] = req.file;
+			if (req.file) {
+				params['file'] = req.file;
+			}
 			this.controller.handle(params, successResponse(res), errorResponse(res), func);
 		};
 	}

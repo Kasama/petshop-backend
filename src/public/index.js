@@ -23,6 +23,28 @@ $(document).ready(() => {
 			}
 		});
 	});
+	$('button#sendProduct').click(() => {
+		let name = $('input#name').val();
+		let description = $('input#description').val();
+		let stock = parseInt($('input#stock').val());
+		let price = parseInt($('input#price').val());
+		$.ajax('/products/add', {
+			cache: false,
+			data: {
+				name: name,
+				description: description,
+				stock: stock,
+				price: price,
+			},
+			success: (result, status, xhr) => {
+				alert("Got result " + JSON.stringify(result));
+			},
+			error: (xhr, status, error) => {
+				alert("Got error " + JSON.stringify(error));
+			},
+			method: 'POST',
+		});
+	});
 	$('button#send').click(() => {
 		let name = $('input#name').val();
 		let age = $('input#age').val();
