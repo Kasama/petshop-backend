@@ -2,7 +2,7 @@ import {Router, Request, Response, NextFunction} from 'express';
 import {ApplicationController} from '../controllers/ApplicationController';
 import * as Multer from 'multer';
 
-const tmpImagePath = '';
+const tmpImagePath = 'tmpFiles/';
 
 const imageUpload = Multer({
 	dest: tmpImagePath,
@@ -14,7 +14,8 @@ function imageFileFilter(
 	cb: (error: Error, acceptFile: boolean) => void
 ) {
 	console.log('==== Filtering image====');
-	console.log('file is ' + file.path);
+	console.log('file ' + JSON.stringify(file));
+	console.log('file is ' + file.originalname);
 	if (!file.originalname.match(/\.(jpe?g|png|gif)$/))
 		cb(new Error('Image files only'), false);
 	else cb(undefined, true);
@@ -63,8 +64,7 @@ export abstract class ApplicationRouter {
 		(req: Request, res: Response, next: NextFunction) => void {
 		return (req: Request, res: Response, next: NextFunction) => {
 			const params = Object.assign(req.params, req.body, req.query);
-			if (req.file) params['file'] = req.file.path;
-			if (req.file) console.log('=====GOT FILE=====');
+			if (req.file) params['file'] = req.file;
 			this.controller.handle(params, successResponse(res), errorResponse(res), func);
 		};
 	}

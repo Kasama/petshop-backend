@@ -1,5 +1,7 @@
 import * as request from 'request';
 import * as fs from 'fs';
+import {Router, Request, Response, NextFunction} from 'express';
+import * as Multer from 'multer';
 
 const url = 'http://191.189.112.147:5984';
 // const url = 'http://localhost:5984';
@@ -62,6 +64,9 @@ class Database<T extends Couch.Document> {
 				pass: dbPass,
 			}
 		} as request.Options;
+		if (form['headers'])
+			if (form['headers']['Content-Type'])
+				delete ret['json'];
 		return Object.assign(ret, form);
 	}
 
@@ -132,19 +137,25 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async saveAttachment(id: string, filepath: string): Promise<Couch.Status> {
-		console.log('going to save attachment ' + filepath + ' on ' + id);
-		const header = await this.headerFor(this.databasePath + id + '/' + attachment);
+	public async saveAttachment(id: string, file: Express.Multer.File): Promise<Couch.Status> {
+		const document = await this.get(id);
+		const head = {
+			'if-Match': document._rev,
+			'Content-Type': file.mimetype,
+		};
+		const header = await this.headerFor(this.databasePath + id + '/' + attachment, { headers: head });
 		return new Promise<Couch.Status>((accept, reject) => {
-			fs.createReadStream(filepath).pipe(request.put(
+			fs.createReadStream(file.path).pipe(request.put(
 				header,
 				(err, resp, body) => {
+					console.log('requested:---\n' + JSON.stringify(resp.request) + '\n---');
 					if (err) { reject(err);
 					} else {
 						const status = {success: resp.body['ok']} as Couch.Status;
 						if (resp.body['reason']) status.message = resp.body['reason'];
 						accept(status);
 					}
+					// fs.unlink(file.path, () => {});
 				}
 			));
 		});

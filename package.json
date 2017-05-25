@@ -25,6 +25,7 @@
     "typescript": "^2.2.2"
   },
   "dependencies": {
+    "source-map-support": "^0.4.15",
     "body-parser": "^1.17.1",
     "couchdb": "^0.3.8",
     "debug": "^2.6.6",

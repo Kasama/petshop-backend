@@ -4,6 +4,8 @@ import * as nodeCleanup from 'node-cleanup';
 
 import App from './App';
 
+import 'source-map-support/register';
+
 const port = normalizePort(process.env.PORT || 3000);
 App.express.set('port', port);
 

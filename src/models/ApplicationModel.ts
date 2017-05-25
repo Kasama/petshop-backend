@@ -98,8 +98,8 @@ abstract class ApplicationModel implements Couch.Document {
 		return this.database.all(limit, skip);
 	}
 
-	public async uploadFile(id: string, filepath: string): Promise<Couch.Status> {
-		return this.database.saveAttachment(id, filepath);
+	public async uploadFile(id: string, file: Express.Multer.File): Promise<Couch.Status> {
+		return this.database.saveAttachment(id, file);
 	}
 
 	public async save(): Promise<Couch.Status> {
