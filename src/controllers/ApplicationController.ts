@@ -4,6 +4,9 @@ export abstract class ApplicationController {
 	success: (answer: any) => void;
 	fail: (err: Error) => void;
 
+	constructor() {
+	}
+
 	handle(
 		params: any,
 		success: (answer: any) => void,
