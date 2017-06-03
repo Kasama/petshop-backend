@@ -1,3 +1,5 @@
+import ApplicationModel from '../models/ApplicationModel';
+
 export abstract class ApplicationController {
 
 	params: any;
@@ -15,12 +17,13 @@ export abstract class ApplicationController {
 	): void {
 		// This may smell a bit, but it's
 		// for the greater good
-		func.bind({
-			params: params,
-			success: success,
-			fail: fail,
-			self: this
-		})();
+		func.bind(
+			Object.assign(this, {
+				params: params,
+				success: success,
+				fail: fail,
+			})
+		)();
 	}
 }
 

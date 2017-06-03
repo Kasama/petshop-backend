@@ -1,0 +1,28 @@
+version: '2'
+services:
+    couchdb:
+        build: ./couchdb
+        ports:
+            - "5984:5984"
+        networks:
+            - db-tier
+        environment:
+            COUCHDB_USER: 'admin'
+            COUCHDB_PASSWORD: 'admin'
+        volumes:
+            - ./couchdb/data:/opt/couchdb/data
+    node:
+        depends_on:
+            - couchdb
+        build: ..
+        ports:
+            - "3000:3000"
+        environment:
+            COUCHDB_HOST: 'couchdb'
+            COUCHDB_PORT: '5984'
+        networks:
+            - db-tier
+
+networks:
+    db-tier:
+        driver: bridge

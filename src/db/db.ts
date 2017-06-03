@@ -3,8 +3,9 @@ import * as fs from 'fs';
 import {Router, Request, Response, NextFunction} from 'express';
 import * as Multer from 'multer';
 
-// const url = 'http://191.189.112.147:5984';
-const url = 'http://localhost:5984';
+const dbHost = process.env.COUCHDB_HOST || 'localhost';
+const dbPort = process.env.COUCHDB_PORT || '5984';
+const url = 'http://' + dbHost + ':' + dbPort;
 const dbUser = 'admin';
 const dbPass = 'admin';
 const designDoc = '_design/docs';

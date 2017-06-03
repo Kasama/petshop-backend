@@ -11,18 +11,23 @@ abstract class ApplicationModel implements Couch.Document {
 	constructor(klass?: { new(): ApplicationModel }, base?: any) {
 		this.database = new Database<ApplicationModel>(klass);
 		this.generateExtraViews();
-		this.dbExists()
-		.then((exists) => {
-			if (!exists.exists) this.MakeDatabase();
-		})
-		.catch((err: Error) => {
-			console.log('Bad stuff: ' + err.message);
-		});
+		this.waitForDatabase();
 		if (base) {
 			if (base._id) this._id = base._id;
 			if (base._rev) this._rev = base._rev;
 		}
 		this.update(base);
+	}
+
+	private waitForDatabase() {
+		this.dbExists()
+		.then((exists) => {
+			if (!exists.exists) this.MakeDatabase();
+		})
+		.catch((err: Error) => {
+			console.log('Failed to connect to database... retrying in 1s');
+			setTimeout(this.waitForDatabase, 1000);
+		});
 	}
 
 	private MakeDatabase() {

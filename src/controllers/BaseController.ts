@@ -10,7 +10,6 @@ export abstract class BaseController extends ApplicationController {
 		super();
 		this.ModelConstructor = modelKlass;
 		this.Model = new this.ModelConstructor();
-		console.log('Model is: ' + this.Model + '---\n' + JSON.stringify(this.Model));
 	}
 
 	exists(): void {
@@ -76,10 +75,6 @@ export abstract class BaseController extends ApplicationController {
 			promises.push(this.Model.find(k, limit, skip, params));
 		}
 		if (everyone) {
-			console.log('Model: ' + this.Model);
-			console.log(JSON.stringify(this.Model));
-			console.log('ModelK: ' + this.ModelConstructor);
-			console.log(JSON.stringify(this.ModelConstructor));
 			promises.push(this.Model.all(limit, skip));
 		}
 		Promise.all(promises)
