@@ -84,6 +84,7 @@ export abstract class BaseController extends ApplicationController {
 	}
 
 	add(): void {
+		console.log('params are:', JSON.stringify(this.params));
 		let model: ApplicationModel;
 		model = new this.ModelConstructor(this.params);
 		model.save().then(this.success).catch(this.fail);

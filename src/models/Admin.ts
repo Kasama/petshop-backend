@@ -1,10 +1,10 @@
 import ApplicationModel from './ApplicationModel';
 
-class Client extends ApplicationModel {
+class Admin extends ApplicationModel {
 
 	public name: string;
 	public surname: string;
-	public address: string;
+	public birthday: string;
 	public phone: string;
 	public email: string;
 	public password: string;
@@ -12,14 +12,14 @@ class Client extends ApplicationModel {
 	public picture: string;
 
 	constructor(base?: any) {
-		super(Client, base);
+		super(Admin, base);
 	}
 
 	fields(): string[] {
 		return [
 			'name',
 			'surname',
-			'address',
+			'birthday',
 			'phone',
 			'email',
 			'password',
@@ -31,4 +31,4 @@ class Client extends ApplicationModel {
 	}
 }
 
-export default Client;
+export default Admin;

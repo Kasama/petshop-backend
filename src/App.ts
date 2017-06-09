@@ -5,7 +5,10 @@ import * as bodyParser from 'body-parser';
 import * as cors from 'cors';
 
 import ClientRouter from './routes/Client';
+import AdminRouter from './routes/Admin';
 import ProductRouter from './routes/Product';
+import ServiceRouter from './routes/Service';
+import PetRouter from './routes/Pet';
 
 class App {
 	public express: express.Application;
@@ -28,7 +31,10 @@ class App {
 
 		this.express.use('/', express.static(__dirname + '/public'));
 		this.express.use('/clients', ClientRouter.router);
+		this.express.use('/admins', AdminRouter.router);
 		this.express.use('/products', ProductRouter.router);
+		this.express.use('/services', ServiceRouter.router);
+		this.express.use('/pets', PetRouter.router);
 	}
 
 	public cleanUp(exitCode: number|null, signal: string|null): void {

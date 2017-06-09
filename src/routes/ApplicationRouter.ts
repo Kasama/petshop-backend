@@ -13,9 +13,6 @@ function imageFileFilter(
 	req: Express.Request, file: Express.Multer.File,
 	cb: (error: Error, acceptFile: boolean) => void
 ) {
-	console.log('==== Filtering image====');
-	console.log('file ' + JSON.stringify(file));
-	console.log('file is ' + file.originalname);
 	if (!file.originalname.match(/\.(jpe?g|png|gif)$/))
 		cb(new Error('Image files only'), false);
 	else cb(undefined, true);
@@ -41,6 +38,7 @@ function successResponse(res): (response) => void {
 
 function errorResponse(res): (err) => void {
 	return (err) => {
+		console.log('returning error: ', JSON.stringify(err));
 		if (err.message)
 			res.send({error: err.message});
 		else
