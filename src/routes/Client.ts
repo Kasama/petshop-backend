@@ -10,6 +10,8 @@ export class Client extends ApplicationRouter {
 	}
 
 	init() {
+		this.get('/login', this.controller.login);
+
 		this.get('/', this.controller.all);
 		this.get('/:_id', this.controller.get);
 		this.delete('/:_id', this.controller.delete);

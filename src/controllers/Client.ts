@@ -5,6 +5,10 @@ export class Client extends BaseController {
 	constructor() {
 		super(ClientModel);
 	}
+
+	login() {
+		this.success({success: true});
+	}
 }
 
 export default Client;

@@ -3,7 +3,12 @@ import ApplicationModel from './ApplicationModel';
 class Client extends ApplicationModel {
 
 	public name: string;
-	public age: number;
+	public surename: string;
+	public address: string;
+	public phone: string;
+	public email: string;
+	public password: string;
+
 	public picture: string;
 
 	constructor(base?: any) {
@@ -13,7 +18,11 @@ class Client extends ApplicationModel {
 	fields(): string[] {
 		return [
 			'name',
-			'age',
+			'surename',
+			'address',
+			'phone',
+			'email',
+			'password',
 		];
 	}
 
