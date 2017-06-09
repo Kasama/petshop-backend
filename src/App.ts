@@ -9,6 +9,7 @@ import AdminRouter from './routes/Admin';
 import ProductRouter from './routes/Product';
 import ServiceRouter from './routes/Service';
 import PetRouter from './routes/Pet';
+import EventRouter from './routes/Event';
 
 class App {
 	public express: express.Application;
@@ -35,6 +36,7 @@ class App {
 		this.express.use('/products', ProductRouter.router);
 		this.express.use('/services', ServiceRouter.router);
 		this.express.use('/pets', PetRouter.router);
+		this.express.use('/events', EventRouter.router);
 	}
 
 	public cleanUp(exitCode: number|null, signal: string|null): void {
