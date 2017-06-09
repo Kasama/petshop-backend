@@ -6,6 +6,7 @@ class Product extends ApplicationModel {
 	public description: number;
 	public price: number;
 	public stock: number;
+	public sold: number;
 	public picture: string;
 
 	constructor(base?: any) {
@@ -18,6 +19,7 @@ class Product extends ApplicationModel {
 			'description',
 			'price',
 			'stock',
+			'sold',
 		];
 	}
 
