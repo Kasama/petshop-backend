@@ -72,7 +72,7 @@ export abstract class BaseController extends ApplicationController {
 			else
 				params = [this.params[k]];
 
-			promises.push(this.Model.find(k, limit, skip, params));
+			promises.push(this.Model.find(k, params, limit, skip));
 		}
 		if (everyone) {
 			promises.push(this.Model.all(limit, skip));

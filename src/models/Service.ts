@@ -1,4 +1,5 @@
 import ApplicationModel from './ApplicationModel';
+import Event from './Event';
 
 class Service extends ApplicationModel {
 
@@ -9,6 +10,7 @@ class Service extends ApplicationModel {
 
 	constructor(base?: any) {
 		super(Service, base);
+		this.isReferencedBy(Event);
 	}
 
 	fields(): string[] {

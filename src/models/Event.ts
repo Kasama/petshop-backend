@@ -1,4 +1,6 @@
 import ApplicationModel from './ApplicationModel';
+import Pet from './Pet';
+import Service from './Service';
 
 class Event extends ApplicationModel {
 
@@ -10,6 +12,8 @@ class Event extends ApplicationModel {
 
 	constructor(base?: any) {
 		super(Event, base);
+		this.refersTo(Pet, 'pet_id');
+		this.refersTo(Service, 'service_id');
 	}
 
 	fields(): string[] {

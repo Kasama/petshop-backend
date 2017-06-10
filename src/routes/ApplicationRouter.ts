@@ -23,14 +23,14 @@ function successResponse(res): (response) => void {
 		let r = response;
 		if (typeof r.map === 'function') {
 			r = r.map(one => {
-				if (typeof one.normalizedModel === 'function') {
-					return one.normalizedModel();
+				if (typeof one.fullModel === 'function') {
+					return one.fullModel();
 				}
 				return one;
 			});
 		} else {
-			if (typeof r.normalizedModel === 'function')
-				r = r.normalizedModel();
+			if (typeof r.fullModel === 'function')
+				r = r.fullModel();
 		}
 		res.send(r);
 	};
@@ -38,11 +38,13 @@ function successResponse(res): (response) => void {
 
 function errorResponse(res): (err) => void {
 	return (err) => {
-		console.log('returning error: ', JSON.stringify(err));
-		if (err.message)
+		if (err.message) {
+			console.log('returning error: ', err.message);
 			res.send({error: err.message});
-		else
+		} else {
+			console.log('returning error: ', JSON.stringify(err));
 			res.send({error: err});
+		}
 	};
 }
 

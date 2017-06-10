@@ -2,6 +2,7 @@ import * as request from 'request';
 import * as fs from 'fs';
 import {Router, Request, Response, NextFunction} from 'express';
 import * as Multer from 'multer';
+import ApplicationModel from '../models/ApplicationModel';
 
 const dbHost = process.env.COUCHDB_HOST || 'localhost';
 const dbPort = process.env.COUCHDB_PORT || '5984';
@@ -40,7 +41,7 @@ function isOk(response: request.RequestResponse) {
 	return (response.statusCode >= 200 && response.statusCode < 300);
 }
 
-class Database<T extends Couch.Document> {
+class Database<T extends ApplicationModel> {
 
 	databaseName: string;
 	databasePath: string;
@@ -187,7 +188,7 @@ class Database<T extends Couch.Document> {
 		});
 	}
 
-	public async find_by(what: string, limit?: number, skip?: number, value?: Array<string>): Promise<T[]> {
+	public async find_by(what: string, value?: Array<string>, limit?: number, skip?: number): Promise<T[]> {
 		const underscore = what.startsWith('_') ? '' : '_';
 		const by = 'by' + underscore + what;
 		let header;
@@ -211,6 +212,7 @@ class Database<T extends Couch.Document> {
 				header = await this.headerFor(this.databaseQuery + by);
 			}
 		}
+		console.log('requesting:=======\n', JSON.stringify(header), '\n========');
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,
@@ -220,9 +222,15 @@ class Database<T extends Couch.Document> {
 					} else {
 						const rows: Array<any> = resp.body['rows'];
 						if (rows) {
-							accept(rows.map(row => {
-								return new this.instance(row['value']);
-							}));
+							const proms: Promise<void>[] = [];
+							const r = rows.map(row => {
+								const inst = new this.instance(row['value']);
+								proms.push(inst.setupReferences());
+								return inst;
+							});
+							Promise.all(proms)
+							.then(v => { accept(r); })
+							.catch(reject);
 						} else {
 							accept([]);
 						}
@@ -234,7 +242,7 @@ class Database<T extends Couch.Document> {
 
 	public async get(id: string): Promise<T> {
 		return new Promise<T>((accept, reject) => {
-			this.find_by('_id', undefined, undefined, [id])
+			this.find_by('_id', [id])
 			.then(acc => {
 				if (acc[0])
 					accept(acc[0]);
@@ -247,7 +255,7 @@ class Database<T extends Couch.Document> {
 
 	public async all(limit?: number, skip?: number): Promise<T[]> {
 		return new Promise<T[]>((accept, reject) => {
-			this.find_by('_id', limit, skip)
+			this.find_by('_id', undefined, limit, skip)
 			.then(acc => accept(acc))
 			.catch(e => reject(e));
 		});

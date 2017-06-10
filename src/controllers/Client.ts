@@ -10,7 +10,7 @@ export class Client extends BaseController {
 	}
 
 	login() {
-		const prom = this.Model.find('email', 1, 0, [this.params['email']]);
+		const prom = this.Model.find('email', [this.params['email']], 1, 0);
 		prom.then(models => {
 			const model = models[0];
 			if (model) {

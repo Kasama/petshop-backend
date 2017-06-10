@@ -1,4 +1,5 @@
 import ApplicationModel from './ApplicationModel';
+import Pet from './Pet';
 
 class Client extends ApplicationModel {
 
@@ -13,6 +14,7 @@ class Client extends ApplicationModel {
 
 	constructor(base?: any) {
 		super(Client, base);
+		this.isReferencedBy(Pet);
 	}
 
 	fields(): string[] {

@@ -5,6 +5,9 @@ abstract class ApplicationModel implements Couch.Document {
 
 	private database: Database<ApplicationModel>;
 	private views: Couch.View[];
+	private ref_names: {[key: string]: {name: string, model: ApplicationModel, field: string} };
+	private is_referenced_by: { new(): ApplicationModel }[];
+	private references: {[key: string]: ApplicationModel};
 	public _id: string;
 	public _rev: string;
 
@@ -12,6 +15,9 @@ abstract class ApplicationModel implements Couch.Document {
 		this.database = new Database<ApplicationModel>(klass);
 		this.generateExtraViews();
 		this.waitForDatabase();
+		this.ref_names = {};
+		this.references = {};
+		this.is_referenced_by = [];
 		if (base) {
 			if (base._id) this._id = base._id;
 			if (base._rev) this._rev = base._rev;
@@ -54,6 +60,19 @@ abstract class ApplicationModel implements Couch.Document {
 		return undefined;
 	}
 
+	protected refersTo(other_model: { new(): ApplicationModel }, field: string) {
+		const name = other_model.name.toLowerCase();
+		this.ref_names[field] = {
+			name: name,
+			model: new other_model(),
+			field: field
+		};
+	}
+
+	protected isReferencedBy(other_model: { new(): ApplicationModel }) {
+		this.is_referenced_by.push(other_model);
+	}
+
 	public model(): any {
 		const m = {};
 		this.normalizedFields().forEach(field => {
@@ -69,6 +88,16 @@ abstract class ApplicationModel implements Couch.Document {
 		return m;
 	}
 
+	public fullModel(): any {
+		const m = this.normalizedModel();
+		for (const prop in this.ref_names) {
+			delete m[prop];
+			const reference = this.references[prop];
+			m[this.ref_names[prop].name] = reference.fullModel();
+		}
+		return m;
+	}
+
 	public normalizedFields(): string[] {
 		const fields = this.fields();
 		if (this.picture_attr())
@@ -79,6 +108,16 @@ abstract class ApplicationModel implements Couch.Document {
 	protected generateExtraViews(): void { this.views = []; }
 
 	// ================ Model Operations ================ \\
+
+	public async setupReferences(): Promise<void> {
+		for (const prop in this.ref_names) {
+			const field = this.ref_names[prop].field;
+			const ref_id = this[field];
+			const model = this.ref_names[prop].model;
+			const ref = await model.get(ref_id);
+			this.references[prop] = ref;
+		}
+	}
 
 	public update(data: any): void {
 		if (data) this.normalizedFields().forEach(field => {
@@ -106,8 +145,8 @@ abstract class ApplicationModel implements Couch.Document {
 		return this.database.get(id);
 	}
 
-	public async find(what: string, limit?: number, skip?: number, value?: Array<string>): Promise<ApplicationModel[]> {
-		return this.database.find_by(what, limit, skip, value);
+	public async find(what: string, value?: Array<string>, limit?: number, skip?: number): Promise<ApplicationModel[]> {
+		return this.database.find_by(what, value, limit, skip);
 	}
 
 	public async all(limit?: number, skip?: number): Promise<ApplicationModel[]> {
@@ -143,11 +182,30 @@ abstract class ApplicationModel implements Couch.Document {
 	}
 
 	public async delete(): Promise<Couch.Status> {
+		const toDelete = [] as ApplicationModel[];
+		for (const ref of this.is_referenced_by) {
+			const refField = this.constructor.name.toLowerCase() + '_id';
+			const mod = await (new ref()).find(refField, [this._id]);
+			toDelete.push(...mod);
+		}
 		return new Promise<Couch.Status>((accept, reject) => {
 			this.database.delete(this.normalizedModel())
 			.then(status => {
-				if (status.success) status.data = this.normalizedModel();
-				accept(status);
+				if (status.success) {
+					const proms = [];
+					toDelete.forEach(model => {
+						console.log('gonna delete: ', model._id);
+						proms.push(model.delete());
+					});
+					status.data = this.normalizedModel();
+					Promise.all(proms)
+					.then(v => accept(status))
+					.catch(e => {
+						this.save()
+						.then(s => reject(e))
+						.catch(ee => reject([ee, e]));
+					});
+				}
 			}).catch(reject);
 		});
 	}

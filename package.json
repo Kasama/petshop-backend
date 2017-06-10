@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "src/index.js",
   "scripts": {
-    "start": "forever -c 'nodemon --exitcrash ' dist/index.js",
+    "start": "forever --spinSleepTime 500 -c 'nodemon --exitcrash ' dist/index.js",
     "build:live": "nodemon --exec ./node_modules/.bin/ts-node -- ./index.ts"
   },
   "keywords": [],
