@@ -1,8 +1,22 @@
 import ApplicationController from './ApplicationController';
+import ApplicationModel from '../models/ApplicationModel';
 
 import Client from '../models/Client';
 import Admin from '../models/Admin';
 
+function get_user(model: ApplicationModel, admin?: boolean) {
+	if (model) {
+		return {
+			success: true,
+			model: model.normalizedModel(),
+			admin: admin
+		};
+	} else {
+		return {
+			success: false
+		};
+	}
+}
 export class Login extends ApplicationController {
 
 	ClientModel: Client;
@@ -23,13 +37,13 @@ export class Login extends ApplicationController {
 
 		this.AdminModel.find('email', [email], 1).then(model => {
 			if (model.length > 0) {
-				this.success({success: true, user: model[0], admin: true});
+				this.success(get_user(model[0], true));
 			} else {
 				this.ClientModel.find('email', [email], 1).then(model => {
 					if (model.length > 0) {
-						this.success({success: true, user: model[0], admin: false});
+						this.success(get_user(model[0], false));
 					} else {
-						this.success({success: false});
+						this.success(get_user(undefined));
 					}
 				}).catch(this.fail);
 			}
