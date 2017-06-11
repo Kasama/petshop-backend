@@ -189,11 +189,13 @@ class Database<T extends ApplicationModel> {
 	}
 
 	public async find_by(what: string, value?: Array<string>, limit?: number, skip?: number): Promise<T[]> {
+		// if (what === undefined) return Promise.reject('what is undefined');
 		const underscore = what.startsWith('_') ? '' : '_';
 		const by = 'by' + underscore + what;
 		let header;
 		if (value) {
 			const quotify = value.map(v => {
+				// if (!v) return v;
 				if (v.startsWith('"') && v.endsWith('"'))
 					return v;
 				return '"' + v + '"';
@@ -212,7 +214,6 @@ class Database<T extends ApplicationModel> {
 				header = await this.headerFor(this.databaseQuery + by);
 			}
 		}
-		console.log('requesting:=======\n', JSON.stringify(header), '\n========');
 		return new Promise<T[]>((accept, reject) => {
 			request.get(
 				header,

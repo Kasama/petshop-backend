@@ -9,26 +9,6 @@ export class Client extends BaseController {
 			super(ClientModel);
 	}
 
-	login() {
-		const prom = this.Model.find('email', [this.params['email']], 1, 0);
-		prom.then(models => {
-			const model = models[0];
-			if (model) {
-				this.success({
-					success: true,
-					user: {
-						id: model._id,
-						type: this.Model.constructor.name
-					}
-				});
-			} else {
-				this.fail(new Error('Invalid Email'));
-			}
-		}).catch(err => {
-			this.fail(new Error('Invalid Email'));
-		});
-	}
-
 	add() {
 		let model: ClientModel;
 		console.log('password: ', this.params['password']);

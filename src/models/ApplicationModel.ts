@@ -39,11 +39,11 @@ abstract class ApplicationModel implements Couch.Document {
 	private MakeDatabase() {
 		this.createDB()
 		.then((succ) => {
-			console.log('Needed to create Database. Status: ' + JSON.stringify(succ));
+			console.log('Needed to create Database ' + this.constructor.name + '. Status: ' + JSON.stringify(succ));
 			if (succ.success) {
 				const viewProm = this.database.makeViewsFor(this.normalizedModel(), this.views);
 				viewProm.then((suc) => {
-					console.log('creating views: ' + JSON.stringify(suc));
+					console.log('creating views for ' + this.constructor.name + ': ' + JSON.stringify(suc));
 				}).catch(e => {
 					console.log('something bad happened while creating views: ' + JSON.stringify(e));
 				});
