@@ -7,9 +7,11 @@ export class Product extends BasicController {
 	}
 
 	buy() {
-		const products_buy = this.params['products'];
+		const products_buy = JSON.parse(this.params['products']);
+		console.log('=======Trying to buy ', JSON.stringify(products_buy));
 		const promises = [] as Promise<ProductModel>[];
 		for (const product_id in products_buy) {
+			console.log('=======Product: ', product_id);
 			const amount = products_buy[product_id];
 			promises.push(this.Model.get(product_id));
 		}

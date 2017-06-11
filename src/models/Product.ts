@@ -28,8 +28,8 @@ class Product extends ApplicationModel {
 	}
 
 	public async sell(amount): Promise<boolean> {
-		this.stock -= amount;
-		this.sold += amount;
+		this.stock = parseInt(this.stock.toString()) - amount;
+		this.sold = parseInt(this.sold.toString()) + amount;
 		return (await this.save()).success;
 	}
 }
