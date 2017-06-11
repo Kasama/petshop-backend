@@ -7,12 +7,35 @@ export class Product extends BasicController {
 	}
 
 	buy() {
-		const products = this.params['products'];
-		const promises = [];
-		for (const product_id in products) {
-			const amount = products[product_id];
+		const products_buy = this.params['products'];
+		const promises = [] as Promise<ProductModel>[];
+		for (const product_id in products_buy) {
+			const amount = products_buy[product_id];
 			promises.push(this.Model.get(product_id));
 		}
+		Promise.all(promises)
+		.then(products => {
+			let failed: ProductModel|undefined = undefined;
+			// Check if all itens are in stock
+			const all_exist = products.every(p => {
+				failed = p;
+				return p.stock >= products_buy[p._id];
+			});
+			if (all_exist) {
+				// if all itens are in stock, update stock and save
+				const save_promises = [];
+				products.forEach(product => {
+					const amount = products_buy[product._id];
+					save_promises.push(product.sell(amount));
+				});
+				Promise.all(save_promises)
+				.then(saves => this.success({success: true}))
+				.catch(e => this.fail(new Error('Failed to write products')));
+			} else {
+				this.success({success: false, product: failed.fullModel()});
+			}
+		})
+		.catch(e => this.fail(new Error('Some products do not exist')));
 	}
 }
 

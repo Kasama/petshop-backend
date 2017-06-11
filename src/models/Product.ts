@@ -26,6 +26,12 @@ class Product extends ApplicationModel {
 	picture_attr(): string {
 		return 'picture';
 	}
+
+	public async sell(amount): Promise<boolean> {
+		this.stock -= amount;
+		this.sold += amount;
+		return (await this.save()).success;
+	}
 }
 
 export default Product;

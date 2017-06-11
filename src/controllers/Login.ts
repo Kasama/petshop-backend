@@ -8,7 +8,7 @@ function get_user(model: ApplicationModel, admin?: boolean) {
 	if (model) {
 		return {
 			success: true,
-			model: model.normalizedModel(),
+			model: model.fullModel(),
 			admin: admin
 		};
 	} else {
@@ -31,9 +31,6 @@ export class Login extends ApplicationController {
 	login() {
 		const email = this.params['email'];
 		const pass = this.params['password'];
-
-		console.log('===========Trying to login ', email);
-		console.log('===========with pass ', pass);
 
 		this.AdminModel.find('email', [email], 1).then(model => {
 			if (model.length > 0) {
