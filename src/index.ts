@@ -6,7 +6,7 @@ import App from './App';
 
 import 'source-map-support/register';
 
-const port = normalizePort(process.env.PORT || 3000);
+const port = normalizePort(process.env.PORT || 3456);
 App.express.set('port', port);
 
 nodeCleanup((exitCode: number|null, signal: string|null) => {

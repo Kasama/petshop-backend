@@ -11,20 +11,31 @@ services:
             COUCHDB_PASSWORD: 'admin'
         volumes:
             - ./couchdb/data:/opt/couchdb/data
-    node:
+    backend:
         depends_on:
             - couchdb
         build: ..
         ports:
-            - "3000:3000"
+            - "3456:3456"
         environment:
             COUCHDB_HOST: 'couchdb'
             COUCHDB_PORT: '5984'
         networks:
             - db-tier
+            - front-tier
         volumes:
-            - ../dist:/usr/src/app/dist
+            - ../dist:/usr/src/petshop/dist
+    frontend:
+        depends_on:
+            - backend
+        build: ../petshop
+        ports:
+            - "3000:3000"
+        networks:
+            - front-tier
 
 networks:
+    front-tier:
+        driver: bridge
     db-tier:
         driver: bridge
