@@ -6,7 +6,7 @@ WORKDIR /usr/src/petshop
 ARG NODE_ENV
 ENV NODE_ENV $NODE_ENV
 COPY package.json /usr/src/petshop
-RUN npm install && npm cache clean --force
+RUN npm install -g forever nodemon && npm install && npm cache clean --force
 COPY . /usr/src/petshop
 
 CMD [ "npm", "start"]
