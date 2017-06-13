@@ -31,9 +31,9 @@ abstract class ApplicationModel implements Couch.Document {
 			if (!exists.exists) this.MakeDatabase();
 		})
 		.catch((err: Error) => {
-			console.log('Failed to connect to database... retrying in 1s');
-			// setTimeout(this.waitForDatabase, 1000);
-			process.exit(1);
+			console.log('Failed to connect to database... retrying in 5s');
+			setTimeout(this.waitForDatabase.bind(this), 5000);
+			// process.exit(1);
 		});
 	}
 
