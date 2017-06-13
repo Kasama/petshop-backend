@@ -33,6 +33,8 @@ services:
             - "3000:3000"
         networks:
             - front-tier
+        volumes:
+            - ../petshop:/home/polymer/app
 
 networks:
     front-tier:

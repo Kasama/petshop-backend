@@ -3,7 +3,7 @@
         "module": "commonjs",
         "target": "es6",
         "noImplicitAny": false,
-		"inlineSourceMap": true,
+		"sourceMap": true,
 		"typeRoots": ["node_modules/@types"],
 		"outDir": "dist"
     },
