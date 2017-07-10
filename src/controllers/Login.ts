@@ -36,12 +36,16 @@ export class Login extends ApplicationController {
 			if (model.length > 0) {
 				if (model[0].password === pass) {
 					this.success(get_user(model[0], true));
+				} else {
+					this.success(get_user(undefined));
 				}
 			} else {
 				this.ClientModel.find('email', [email], 1).then((model: Client[]) => {
 					if (model.length > 0) {
 						if (model[0].password === pass) {
 							this.success(get_user(model[0], false));
+						} else {
+							this.success(get_user(undefined));
 						}
 					} else {
 						this.success(get_user(undefined));
